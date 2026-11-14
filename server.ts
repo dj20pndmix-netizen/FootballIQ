@@ -1198,10 +1198,13 @@ async function startServer() {
   process.on('SIGINT', () => shutdown('SIGINT'));
 }
 
-const isEntrypoint =
-  Boolean(process.argv[1]) && path.resolve(process.argv[1]) === path.resolve(__filename);
+// Ensure server boots cleanly in production, Docker, and Render.com environments
+// Skips auto-boot only when explicitly invoked by integration test runners
+const isTestRunner =
+  process.env.NODE_ENV === 'test' ||
+  process.argv.some((arg) => arg.includes('test') || arg.includes('mocha') || arg.includes('jest'));
 
-if (isEntrypoint) {
+if (!isTestRunner) {
   startServer().catch((err) => {
     console.error('Fatal Server Boot Error:', err);
     process.exit(1);
