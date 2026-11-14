@@ -234,32 +234,19 @@ export function isAdminUser(user?: { email?: string | null; role?: string | null
 }
 
 /**
- * Retrieve cached user session from localStorage if verified
+ * Retrieve cached user session. Disabled to guarantee strict explicit login
+ * and prevent automatic session restoration without user consent.
  */
 export function getCachedUserSession(): UserProfile | null {
-  try {
-    const raw = localStorage.getItem(ACTIVE_SESSION_STORAGE_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    if (parsed && typeof parsed === 'object' && parsed.email && parsed.emailVerified) {
-      return parsed as UserProfile;
-    }
-    return null;
-  } catch {
-    return null;
-  }
+  return null;
 }
 
 /**
- * Persist or clear user session in localStorage
+ * Clear user session in localStorage to prevent automatic login
  */
-export function setCachedUserSession(profile: UserProfile | null): void {
+export function setCachedUserSession(_profile: UserProfile | null): void {
   try {
-    if (profile) {
-      localStorage.setItem(ACTIVE_SESSION_STORAGE_KEY, JSON.stringify(profile));
-    } else {
-      localStorage.removeItem(ACTIVE_SESSION_STORAGE_KEY);
-    }
+    localStorage.removeItem(ACTIVE_SESSION_STORAGE_KEY);
   } catch {
     // Ignore storage restrictions
   }
@@ -299,15 +286,9 @@ export async function syncUserProfile(user: FirebaseUser): Promise<UserProfile> 
     } else {
       await setDoc(userRef, baseProfile);
     }
-    if (resolvedProfile.emailVerified) {
-      setCachedUserSession(resolvedProfile);
-    }
     return resolvedProfile;
   } catch (err) {
     console.warn('Firestore user profile sync deferred, using local auth profile:', err);
-    if (baseProfile.emailVerified) {
-      setCachedUserSession(baseProfile);
-    }
     return baseProfile;
   }
 }
@@ -513,7 +494,6 @@ export async function signInWithGoogle(fallbackEmail?: string, fallbackName?: st
         emailVerified: true,
       };
 
-      setCachedUserSession(verifiedProfile);
       return verifiedProfile;
     }
 
@@ -523,7 +503,10 @@ export async function signInWithGoogle(fallbackEmail?: string, fallbackName?: st
 }
 
 export async function signOutUser(): Promise<void> {
-  setCachedUserSession(null);
+  try {
+    localStorage.removeItem(ACTIVE_SESSION_STORAGE_KEY);
+    sessionStorage.clear();
+  } catch {}
   try {
     await fbSignOut(auth);
   } catch (err) {

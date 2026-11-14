@@ -84,7 +84,7 @@ export default function App() {
   const [fixtures, setFixtures] = useState<Fixture[]>([]);
   const [selectedFixture, setSelectedFixture] = useState<Fixture | null>(null);
   const [selectedFixtureForChat, setSelectedFixtureForChat] = useState<Fixture | null>(null);
-  const [user, setUser] = useState<UserProfile | null>(() => getCachedUserSession());
+  const [user, setUser] = useState<UserProfile | null>(null);
   const [isAuthChecking, setIsAuthChecking] = useState<boolean>(true);
   const [isGoogleDriveOpen, setIsGoogleDriveOpen] = useState<boolean>(false);
 
@@ -120,6 +120,13 @@ export default function App() {
   useEffect(() => {
     userRef.current = user;
   }, [user]);
+
+  // Strictly prevent auto-login: purge any stale legacy cached sessions on startup
+  useEffect(() => {
+    try {
+      localStorage.removeItem('footballiq_active_session');
+    } catch {}
+  }, []);
 
   const handleToggleSidebarCollapse = () => {
     setSidebarCollapsed((prev) => {
@@ -268,59 +275,57 @@ export default function App() {
     })();
 
     const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
-      if (fbUser) {
+      if (fbUser && fbUser.emailVerified) {
         try {
           const profile = await syncUserProfile(fbUser);
-          setUser(profile);
-          userRef.current = profile;
-          if (profile.timezone) {
-            setSelectedTimezone(profile.timezone);
-          }
+          if (profile.emailVerified) {
+            setUser(profile);
+            userRef.current = profile;
+            if (profile.timezone) {
+              setSelectedTimezone(profile.timezone);
+            }
 
-          // Reconcile with Firestore stored fixtures & sync jobs
-          try {
-            const [fsFixtures, fsJobs] = await Promise.all([
-              loadSyncedFixturesFromFirestore(),
-              loadSyncJobsFromFirestore(),
-            ]);
-            if (fsFixtures.length > 0) {
-              const merged = mergeFixtureUpdates(fixturesRef.current, fsFixtures);
-              setFixtures(merged);
-              fixturesRef.current = merged;
-              saveFixtureUpdatesToCache(merged);
+            // Reconcile with Firestore stored fixtures & sync jobs
+            try {
+              const [fsFixtures, fsJobs] = await Promise.all([
+                loadSyncedFixturesFromFirestore(),
+                loadSyncJobsFromFirestore(),
+              ]);
+              if (fsFixtures.length > 0) {
+                const merged = mergeFixtureUpdates(fixturesRef.current, fsFixtures);
+                setFixtures(merged);
+                fixturesRef.current = merged;
+                saveFixtureUpdatesToCache(merged);
+              }
+              if (fsJobs.length > 0) {
+                setSyncJobs((prev) => {
+                  const seen = new Set(prev.map((j) => j.id));
+                  const combined = [...prev, ...fsJobs.filter((j) => !seen.has(j.id))]
+                    .sort((a, b) => b.startedAt.localeCompare(a.startedAt))
+                    .slice(0, 25);
+                  saveSyncJobsToCache(combined);
+                  return combined;
+                });
+              }
+              if (isAdminUser(profile) && fixturesRef.current.length > 0) {
+                await persistFixturesAndPredictionsToFirestore(fixturesRef.current);
+              }
+            } catch (fbErr) {
+              console.warn('Firestore state sync deferred:', fbErr);
             }
-            if (fsJobs.length > 0) {
-              setSyncJobs((prev) => {
-                const seen = new Set(prev.map((j) => j.id));
-                const combined = [...prev, ...fsJobs.filter((j) => !seen.has(j.id))]
-                  .sort((a, b) => b.startedAt.localeCompare(a.startedAt))
-                  .slice(0, 25);
-                saveSyncJobsToCache(combined);
-                return combined;
-              });
-            }
-            if (isAdminUser(profile) && fixturesRef.current.length > 0) {
-              await persistFixturesAndPredictionsToFirestore(fixturesRef.current);
-            }
-          } catch (fbErr) {
-            console.warn('Firestore state sync deferred:', fbErr);
+          } else {
+            setUser(null);
+            userRef.current = null;
           }
         } catch (err) {
           console.warn('Auth state sync error:', err);
-        }
-      } else {
-        // If Firebase auth has no active user, check if a valid verified session was persisted
-        const cached = getCachedUserSession();
-        if (cached && cached.emailVerified) {
-          setUser(cached);
-          userRef.current = cached;
-          if (cached.timezone) {
-            setSelectedTimezone(cached.timezone);
-          }
-        } else {
           setUser(null);
           userRef.current = null;
         }
+      } else {
+        // No verified Firebase session: user MUST remain logged out
+        setUser(null);
+        userRef.current = null;
       }
       setIsAuthChecking(false);
     });
