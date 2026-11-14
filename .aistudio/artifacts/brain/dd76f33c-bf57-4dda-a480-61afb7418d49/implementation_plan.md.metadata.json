@@ -1,0 +1,6 @@
+{
+  "summary":  "Implementation plan for replacing the pie chart with a separate-column Win/Loss/Pending vertical bar graph and reorganizing FootballIQ into a collapsible left sidebar, slim breadcrumb top bar, compact filter toolbar, and clean 2-column match grid.",
+  "updatedAt":  "2026-11-14T05:54:47.079788755Z",
+  "requestFeedback":  true,
+  "userFacing":  true
+}

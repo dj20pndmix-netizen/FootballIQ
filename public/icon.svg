@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#020617" />
+      <stop offset="50%" stop-color="#064e3b" />
+      <stop offset="100%" stop-color="#022c22" />
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="50%" stop-color="#14b8a6" />
+      <stop offset="100%" stop-color="#06b6d4" />
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fbbf24" />
+      <stop offset="100%" stop-color="#f59e0b" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="12" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Background Shield Container -->
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad)" />
+  <rect width="496" height="496" x="8" y="8" rx="104" fill="none" stroke="#10b981" stroke-width="4" stroke-opacity="0.3" />
+
+  <!-- Outer Geometric Tech Rings -->
+  <circle cx="256" cy="256" r="190" fill="none" stroke="#059669" stroke-width="2" stroke-dasharray="16 12" stroke-opacity="0.4" />
+  <circle cx="256" cy="256" r="160" fill="none" stroke="#10b981" stroke-width="3" stroke-opacity="0.25" />
+
+  <!-- Heraldic Football Shield Center -->
+  <path d="M 176 130 L 336 130 C 356 130 376 170 376 240 C 376 340 256 410 256 410 C 256 410 136 340 136 240 C 136 170 156 130 176 130 Z" 
+        fill="#042f2e" stroke="url(#accentGrad)" stroke-width="8" filter="url(#glow)" />
+
+  <!-- Inner Pitch Marking Elements -->
+  <path d="M 156 220 L 356 220" stroke="#10b981" stroke-width="3" stroke-opacity="0.5" />
+  <circle cx="256" cy="220" r="48" fill="none" stroke="#10b981" stroke-width="3" stroke-opacity="0.5" />
+  <circle cx="256" cy="220" r="6" fill="#10b981" />
+
+  <!-- Central Intelligence Monogram IQ & Lambda -->
+  <text x="256" y="325" font-family="'JetBrains Mono', monospace" font-size="92" font-weight="900" fill="#ffffff" text-anchor="middle" letter-spacing="4">
+    IQ
+  </text>
+  <text x="256" y="270" font-family="sans-serif" font-size="28" font-weight="800" fill="url(#goldGrad)" text-anchor="middle" letter-spacing="6">
+    FOOTBALL
+  </text>
+
+  <!-- Crown Stars -->
+  <polygon points="256,88 262,106 280,106 266,118 271,136 256,124 241,136 246,118 232,106 250,106" fill="url(#goldGrad)" />
+  <polygon points="216,98 221,112 235,112 224,121 228,135 216,126 204,135 208,121 197,112 211,112" fill="url(#goldGrad)" opacity="0.8" />
+  <polygon points="296,98 301,112 315,112 304,121 308,135 296,126 284,135 288,121 277,112 291,112" fill="url(#goldGrad)" opacity="0.8" />
+</svg>

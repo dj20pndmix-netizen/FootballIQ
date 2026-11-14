@@ -1,0 +1,58 @@
+{
+  "name": "FootballIQ - Predictive Football Intelligence Platform",
+  "short_name": "FootballIQ",
+  "description": "Professional quantitative football analytics, Poisson and Dixon-Coles prediction engines for 30 world leagues.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#020617",
+  "theme_color": "#020617",
+  "categories": ["sports", "analytics", "productivity"],
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Live Matchday Predictions",
+      "short_name": "Predictions",
+      "url": "/?tab=fixtures",
+      "icons": [{ "src": "/icon.svg", "sizes": "192x192" }]
+    },
+    {
+      "name": "AI Tactical Scout",
+      "short_name": "Tactical Scout",
+      "url": "/?tab=scout",
+      "icons": [{ "src": "/icon.svg", "sizes": "192x192" }]
+    },
+    {
+      "name": "AI Analyst Chat",
+      "short_name": "Analyst Chat",
+      "url": "/?tab=chat",
+      "icons": [{ "src": "/icon.svg", "sizes": "192x192" }]
+    }
+  ]
+}

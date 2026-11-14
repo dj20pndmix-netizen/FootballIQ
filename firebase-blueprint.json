@@ -1,0 +1,140 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile and account settings",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "maxLength": 256 },
+        "displayName": { "type": "string", "maxLength": 128 },
+        "photoURL": { "type": "string", "maxLength": 1024 },
+        "role": { "type": "string", "enum": ["admin", "user"] },
+        "timezone": { "type": "string", "maxLength": 64 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "role", "createdAt"]
+    },
+    "Fixture": {
+      "title": "Fixture",
+      "description": "Synchronized football match fixture state, live/final scores, and half-time split",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "competitionId": { "type": "string", "maxLength": 64 },
+        "homeTeamName": { "type": "string", "maxLength": 128 },
+        "awayTeamName": { "type": "string", "maxLength": 128 },
+        "kickoffTimeUtc": { "type": "string", "format": "date-time", "maxLength": 64 },
+        "status": { "type": "string", "enum": ["NS", "LIVE", "HT", "FT", "POSTP", "CANC"] },
+        "currentHome": { "type": "number" },
+        "currentAway": { "type": "number" },
+        "htHome": { "type": "number" },
+        "htAway": { "type": "number" },
+        "minute": { "type": "number" },
+        "syncSource": { "type": "string", "maxLength": 128 },
+        "lastUpdatedUtc": { "type": "string", "format": "date-time", "maxLength": 64 }
+      },
+      "required": [
+        "id",
+        "competitionId",
+        "homeTeamName",
+        "awayTeamName",
+        "kickoffTimeUtc",
+        "status",
+        "currentHome",
+        "currentAway",
+        "syncSource",
+        "lastUpdatedUtc"
+      ]
+    },
+    "Prediction": {
+      "title": "Prediction",
+      "description": "Calculated quantitative prediction snapshot for a fixture across multiple markets",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "fixtureId": { "type": "string", "maxLength": 128 },
+        "modelVersion": { "type": "string", "maxLength": 64 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "status": { "type": "string", "enum": ["pending", "won", "lost", "void"] },
+        "actualScore": { "type": "string", "maxLength": 64 },
+        "markets": { "type": "object" },
+        "dataQualityStatus": { "type": "string", "enum": ["valid", "incomplete", "stale", "invalid"] }
+      },
+      "required": ["id", "fixtureId", "modelVersion", "status", "createdAt", "markets", "dataQualityStatus"]
+    },
+    "SyncJob": {
+      "title": "SyncJob",
+      "description": "Football data provider ingestion job record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "provider": { "type": "string", "maxLength": 64 },
+        "trigger": { "type": "string", "enum": ["auto", "manual", "boot"] },
+        "status": { "type": "string", "enum": ["success", "failed", "running"] },
+        "recordsSynced": { "type": "number" },
+        "message": { "type": "string", "maxLength": 500 },
+        "startedAt": { "type": "string", "format": "date-time" },
+        "completedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "provider", "status", "recordsSynced", "startedAt"]
+    },
+    "VideoGeneration": {
+      "title": "VideoGeneration",
+      "description": "Veo cinematic match preview or highlight video animation",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "prompt": { "type": "string", "maxLength": 1000 },
+        "aspectRatio": { "type": "string", "enum": ["16:9", "9:16"] },
+        "status": { "type": "string", "enum": ["pending", "processing", "completed", "failed"] },
+        "videoUrl": { "type": "string", "maxLength": 2048 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "prompt", "aspectRatio", "status", "createdAt"]
+    },
+    "ChatSession": {
+      "title": "ChatSession",
+      "description": "Multi-turn Gemini AI Analyst chat conversation history",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "maxLength": 200 },
+        "activeModel": { "type": "string", "enum": ["gemini-4-hydrogen", "gemini-4-carbon", "gemini-4-argon", "gemini-3.1-flash-lite"] },
+        "messages": { "type": "array" },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "activeModel", "messages", "updatedAt", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "User profile documents"
+    },
+    "/users/{userId}/chat_sessions/{sessionId}": {
+      "schema": { "$ref": "#/entities/ChatSession" },
+      "description": "Multi-turn Gemini chatbot conversation threads per user"
+    },
+    "/fixtures/{fixtureId}": {
+      "schema": { "$ref": "#/entities/Fixture" },
+      "description": "Synchronized football fixture scores, statuses, and timestamps"
+    },
+    "/predictions/{predictionId}": {
+      "schema": { "$ref": "#/entities/Prediction" },
+      "description": "Calculated probabilistic match predictions and settlements"
+    },
+    "/sync_jobs/{jobId}": {
+      "schema": { "$ref": "#/entities/SyncJob" },
+      "description": "Provider ingestion synchronization audit logs"
+    },
+    "/video_generations/{genId}": {
+      "schema": { "$ref": "#/entities/VideoGeneration" },
+      "description": "Veo video animation records requested by users"
+    }
+  }
+}

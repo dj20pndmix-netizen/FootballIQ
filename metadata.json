@@ -1,0 +1,6 @@
+{
+  "name": "FootballIQ - Predictive Football Intelligence Platform",
+  "description": "Professional quantitative football analytics, Poisson and Dixon-Coles prediction engines for 1X2, BTTS, Over/Under 2.5, HT/FT, Double Chance markets, with real-time and historical match calibration.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

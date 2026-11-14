@@ -1,0 +1,226 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default-deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        (request.auth.token.email == 'dj20pndmix@gmail.com' && request.auth.token.email_verified == true) ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    function isValidChatSession(data) {
+      return data.keys().hasAll(['id', 'userId', 'activeModel', 'messages', 'updatedAt', 'createdAt']) &&
+        data.keys().hasOnly(['id', 'userId', 'title', 'activeModel', 'messages', 'updatedAt', 'createdAt']) &&
+        data.id is string && data.id.size() <= 128 &&
+        data.userId is string && data.userId == request.auth.uid &&
+        (!('title' in data) || (data.title is string && data.title.size() <= 200)) &&
+        data.activeModel in ['gemini-4-hydrogen', 'gemini-4-carbon', 'gemini-4-argon', 'gemini-3.1-flash-lite'] &&
+        data.messages is list && data.messages.size() <= 100 &&
+        data.createdAt is string && data.createdAt.size() <= 64 &&
+        data.updatedAt is string && data.updatedAt.size() <= 64;
+    }
+
+    function isValidFixture(data) {
+      return data.keys().hasAll([
+          'id', 'competitionId', 'homeTeamName', 'awayTeamName',
+          'kickoffTimeUtc', 'status', 'currentHome', 'currentAway',
+          'syncSource', 'lastUpdatedUtc'
+        ]) &&
+        data.keys().hasOnly([
+          'id', 'competitionId', 'homeTeamName', 'awayTeamName',
+          'kickoffTimeUtc', 'status', 'currentHome', 'currentAway',
+          'htHome', 'htAway', 'minute', 'syncSource', 'lastUpdatedUtc'
+        ]) &&
+        data.id is string && data.id.size() > 0 && data.id.size() <= 128 &&
+        data.competitionId is string && data.competitionId.size() > 0 && data.competitionId.size() <= 64 &&
+        data.homeTeamName is string && data.homeTeamName.size() > 0 && data.homeTeamName.size() <= 128 &&
+        data.awayTeamName is string && data.awayTeamName.size() > 0 && data.awayTeamName.size() <= 128 &&
+        data.kickoffTimeUtc is string && data.kickoffTimeUtc.size() <= 64 &&
+        data.status in ['NS', 'LIVE', 'HT', 'FT', 'POSTP', 'CANC'] &&
+        data.currentHome is number && data.currentHome >= 0 && data.currentHome <= 50 &&
+        data.currentAway is number && data.currentAway >= 0 && data.currentAway <= 50 &&
+        (!('htHome' in data) || (data.htHome is number && data.htHome >= 0 && data.htHome <= 50)) &&
+        (!('htAway' in data) || (data.htAway is number && data.htAway >= 0 && data.htAway <= 50)) &&
+        (!('minute' in data) || (data.minute is number && data.minute >= 0 && data.minute <= 140)) &&
+        data.syncSource is string && data.syncSource.size() > 0 && data.syncSource.size() <= 128 &&
+        data.lastUpdatedUtc is string && data.lastUpdatedUtc.size() <= 64;
+    }
+
+    function isValidPrediction(data) {
+      return data.keys().hasAll(['id', 'fixtureId', 'modelVersion', 'status', 'createdAt', 'markets', 'dataQualityStatus']) &&
+        data.keys().hasOnly(['id', 'fixtureId', 'modelVersion', 'createdAt', 'updatedAt', 'status', 'actualScore', 'markets', 'dataQualityStatus']) &&
+        data.id is string && data.id.size() > 0 && data.id.size() <= 128 &&
+        data.fixtureId is string && data.fixtureId.size() > 0 && data.fixtureId.size() <= 128 &&
+        data.modelVersion is string && data.modelVersion.size() > 0 && data.modelVersion.size() <= 64 &&
+        data.status in ['pending', 'won', 'lost', 'void'] &&
+        data.createdAt is string && data.createdAt.size() <= 64 &&
+        (!('updatedAt' in data) || (data.updatedAt is string && data.updatedAt.size() <= 64)) &&
+        (!('actualScore' in data) || (data.actualScore is string && data.actualScore.size() <= 64)) &&
+        data.markets is map &&
+        data.dataQualityStatus in ['valid', 'incomplete', 'stale', 'invalid'];
+    }
+
+    function isValidSyncJob(data) {
+      return data.keys().hasAll(['id', 'provider', 'status', 'recordsSynced', 'startedAt']) &&
+        data.keys().hasOnly(['id', 'provider', 'trigger', 'status', 'recordsSynced', 'message', 'startedAt', 'completedAt']) &&
+        data.id is string && data.id.size() > 0 && data.id.size() <= 128 &&
+        data.provider is string && data.provider.size() > 0 && data.provider.size() <= 64 &&
+        (!('trigger' in data) || data.trigger in ['auto', 'manual', 'boot']) &&
+        data.status in ['success', 'failed', 'running'] &&
+        data.recordsSynced is number && data.recordsSynced >= 0 && data.recordsSynced <= 10000 &&
+        (!('message' in data) || (data.message is string && data.message.size() <= 500)) &&
+        data.startedAt is string && data.startedAt.size() <= 64 &&
+        (!('completedAt' in data) || (data.completedAt is string && data.completedAt.size() <= 64));
+    }
+
+    // Health check collection for connection testing
+    match /test/{testId} {
+      allow read, write: if true;
+    }
+
+    // Users collection
+    match /users/{userId} {
+      allow get: if isSignedIn() && (request.auth.uid == userId || isAdmin());
+      allow list: if isAdmin();
+      allow create: if isSignedIn() && request.auth.uid == userId && isValidId(userId) &&
+        incoming().keys().hasAll(['uid', 'email', 'role', 'createdAt']) &&
+        incoming().keys().hasOnly(['uid', 'email', 'displayName', 'photoURL', 'role', 'timezone', 'createdAt']) &&
+        incoming().uid == request.auth.uid &&
+        incoming().email is string && incoming().email.size() <= 256 &&
+        (!('displayName' in incoming()) || (incoming().displayName is string && incoming().displayName.size() <= 128)) &&
+        (!('photoURL' in incoming()) || (incoming().photoURL is string && incoming().photoURL.size() <= 1024)) &&
+        (!('timezone' in incoming()) || (incoming().timezone is string && incoming().timezone.size() <= 64)) &&
+        incoming().role is string &&
+        (incoming().role == 'user' || (incoming().role == 'admin' && isAdmin())) &&
+        incoming().createdAt is string && incoming().createdAt.size() <= 64;
+
+      allow update: if isSignedIn() && (request.auth.uid == userId || isAdmin()) && isValidId(userId) &&
+        incoming().uid == existing().uid &&
+        incoming().createdAt == existing().createdAt &&
+        (!incoming().diff(existing()).affectedKeys().hasAny(['role']) || isAdmin()) &&
+        incoming().keys().hasOnly(['uid', 'email', 'displayName', 'photoURL', 'role', 'timezone', 'createdAt']) &&
+        incoming().email is string && incoming().email.size() <= 256 &&
+        (!('displayName' in incoming()) || (incoming().displayName is string && incoming().displayName.size() <= 128)) &&
+        (!('photoURL' in incoming()) || (incoming().photoURL is string && incoming().photoURL.size() <= 1024)) &&
+        (!('timezone' in incoming()) || (incoming().timezone is string && incoming().timezone.size() <= 64));
+
+      allow delete: if isAdmin();
+
+      // Multi-turn Gemini chat sessions subcollection
+      match /chat_sessions/{sessionId} {
+        allow get: if isSignedIn() && isValidId(userId) && isValidId(sessionId) &&
+          (request.auth.uid == userId || isAdmin()) &&
+          exists(/databases/$(database)/documents/users/$(userId));
+        allow list: if isSignedIn() && isValidId(userId) &&
+          (request.auth.uid == userId || isAdmin()) &&
+          resource.data.userId == userId;
+        allow create: if isSignedIn() && isValidId(userId) && isValidId(sessionId) &&
+          request.auth.uid == userId &&
+          isValidChatSession(incoming()) &&
+          exists(/databases/$(database)/documents/users/$(userId));
+        allow update: if isSignedIn() && isValidId(userId) && isValidId(sessionId) &&
+          (request.auth.uid == userId || isAdmin()) &&
+          isValidChatSession(incoming()) &&
+          incoming().id == existing().id &&
+          incoming().userId == existing().userId &&
+          incoming().createdAt == existing().createdAt &&
+          incoming().diff(existing()).affectedKeys().hasOnly(['title', 'activeModel', 'messages', 'updatedAt']);
+        allow delete: if isSignedIn() && isValidId(userId) && isValidId(sessionId) &&
+          (request.auth.uid == userId || isAdmin());
+      }
+    }
+
+    // Synchronized Fixtures collection (Monotonic FT guard + strict schema validation)
+    match /fixtures/{fixtureId} {
+      allow get, list: if isSignedIn();
+      allow create: if isAdmin() && isValidId(fixtureId) &&
+        incoming().id == fixtureId &&
+        isValidFixture(incoming());
+      allow update: if isAdmin() && isValidId(fixtureId) &&
+        incoming().id == existing().id &&
+        incoming().kickoffTimeUtc == existing().kickoffTimeUtc &&
+        (existing().status != 'FT' || incoming().status == 'FT') &&
+        isValidFixture(incoming());
+      allow delete: if isAdmin();
+    }
+
+    // Predictions collection
+    match /predictions/{predictionId} {
+      allow get, list: if isSignedIn();
+      allow create: if isAdmin() && isValidId(predictionId) &&
+        incoming().id == predictionId &&
+        isValidPrediction(incoming());
+      allow update: if isAdmin() && isValidId(predictionId) &&
+        incoming().id == existing().id &&
+        incoming().fixtureId == existing().fixtureId &&
+        incoming().createdAt == existing().createdAt &&
+        isValidPrediction(incoming());
+      allow delete: if isAdmin();
+    }
+
+    // Provider Sync Jobs collection
+    match /sync_jobs/{jobId} {
+      allow get, list: if isSignedIn();
+      allow create: if isAdmin() && isValidId(jobId) &&
+        incoming().id == jobId &&
+        isValidSyncJob(incoming());
+      allow update: if isAdmin() && isValidId(jobId) &&
+        incoming().id == existing().id &&
+        incoming().startedAt == existing().startedAt &&
+        isValidSyncJob(incoming());
+      allow delete: if isAdmin();
+    }
+
+    // Video generation records (Veo Preview)
+    match /video_generations/{genId} {
+      allow get: if isSignedIn() && (existing().userId == request.auth.uid || isAdmin());
+      allow list: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() && isValidId(genId) &&
+        incoming().keys().hasAll(['id', 'userId', 'prompt', 'aspectRatio', 'status', 'createdAt']) &&
+        incoming().keys().hasOnly(['id', 'userId', 'prompt', 'aspectRatio', 'status', 'videoUrl', 'createdAt', 'model']) &&
+        incoming().id == genId &&
+        incoming().userId == request.auth.uid &&
+        incoming().prompt is string && incoming().prompt.size() <= 1000 &&
+        incoming().aspectRatio in ['16:9', '9:16'] &&
+        incoming().status in ['pending', 'processing', 'completed', 'failed'] &&
+        incoming().createdAt is string && incoming().createdAt.size() <= 64 &&
+        (!('videoUrl' in incoming()) || (incoming().videoUrl is string && incoming().videoUrl.size() <= 2048)) &&
+        (!('model' in incoming()) || (incoming().model is string && incoming().model.size() <= 128));
+
+      allow update: if isSignedIn() && (existing().userId == request.auth.uid || isAdmin()) &&
+        incoming().id == existing().id &&
+        incoming().userId == existing().userId &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().keys().hasOnly(['id', 'userId', 'prompt', 'aspectRatio', 'status', 'videoUrl', 'createdAt', 'model']) &&
+        incoming().prompt is string && incoming().prompt.size() <= 1000 &&
+        incoming().aspectRatio in ['16:9', '9:16'] &&
+        incoming().status in ['pending', 'processing', 'completed', 'failed'] &&
+        (!('videoUrl' in incoming()) || (incoming().videoUrl is string && incoming().videoUrl.size() <= 2048)) &&
+        (!('model' in incoming()) || (incoming().model is string && incoming().model.size() <= 128));
+
+      allow delete: if isSignedIn() && (existing().userId == request.auth.uid || isAdmin());
+    }
+  }
+}

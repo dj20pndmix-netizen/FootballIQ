@@ -1,0 +1,22 @@
+# Render.com Blueprint Deployment Specification
+# https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: footballiq-predictive-platform
+    env: node
+    plan: free
+    region: frankfurt
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: SPORTMONKS_API_TOKEN
+        sync: false
