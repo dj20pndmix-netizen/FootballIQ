@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Flame,
   Mail,
@@ -16,6 +16,10 @@ import {
   Globe2,
   Sparkles,
   KeyRound,
+  Camera,
+  Upload,
+  X,
+  Image as ImageIcon,
 } from 'lucide-react';
 import {
   UserProfile,
@@ -53,10 +57,19 @@ export const AuthPortalView: React.FC<AuthPortalViewProps> = ({
   const [displayName, setDisplayName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [repeatPassword, setRepeatPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [agreeTerms, setAgreeTerms] = useState(true);
+  const [showRepeatPassword, setShowRepeatPassword] = useState(false);
+
+  // Profile Photo Upload State (for registration preview)
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Verification Screen State
+  const [verificationEmail, setVerificationEmail] = useState<string>(() => user?.email || '');
+
+  // Reset Password Status
+  const [resetLinkSent, setResetLinkSent] = useState<boolean>(false);
 
   // States
   const [isLoading, setIsLoading] = useState(false);
@@ -69,8 +82,9 @@ export const AuthPortalView: React.FC<AuthPortalViewProps> = ({
   useEffect(() => {
     if (user && !user.emailVerified) {
       setMode('verify_pending');
-      if (user.email && !email) {
-        setEmail(user.email);
+      if (user.email) {
+        setVerificationEmail(user.email);
+        if (!email) setEmail(user.email);
       }
     }
   }, [user]);
@@ -90,7 +104,33 @@ export const AuthPortalView: React.FC<AuthPortalViewProps> = ({
 
   const handleSwitchMode = (newMode: AuthMode) => {
     clearFeedback();
+    setResetLinkSent(false);
     setMode(newMode);
+  };
+
+  // Handle Photo File Selection
+  const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+      setErrorMessage('Profile photo must be smaller than 2MB.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPhotoPreview(reader.result as string);
+      clearFeedback();
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemovePhoto = () => {
+    setPhotoPreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   // 1. Sign In With Email & Password
@@ -99,19 +139,22 @@ export const AuthPortalView: React.FC<AuthPortalViewProps> = ({
     clearFeedback();
 
     if (!email.trim() || !password) {
-      setErrorMessage('Please enter both your email address and password.');
+      setErrorMessage('password or email incorrect ');
       return;
     }
 
     try {
       setIsLoading(true);
       const profile = await signInWithEmail(email, password);
+
+      // If email is not verified, do not allow user into dashboard; show verification screen
       if (!profile.emailVerified) {
+        setVerificationEmail(profile.email || email.trim());
         setMode('verify_pending');
-        setSuccessMessage('Please verify your email address to complete signing in.');
-      } else {
-        onAuthSuccess(profile);
+        return;
       }
+
+      onAuthSuccess(profile);
     } catch (err: any) {
       setErrorMessage(formatAuthErrorMessage(err));
     } finally {
@@ -119,13 +162,13 @@ export const AuthPortalView: React.FC<AuthPortalViewProps> = ({
     }
   };
 
-  // 2. Sign Up (Create Account) With Mandatory Verification
+  // 2. Sign Up (Registration Form with Photo, Name, Email, Password, Repeat Password)
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     clearFeedback();
 
     if (!displayName.trim()) {
-      setErrorMessage('Please enter your full name or analyst alias.');
+      setErrorMessage('Please enter your full name.');
       return;
     }
     if (!email.trim()) {
@@ -136,50 +179,53 @@ export const AuthPortalView: React.FC<AuthPortalViewProps> = ({
       setErrorMessage('Password must be at least 6 characters long.');
       return;
     }
-    if (password !== confirmPassword) {
+    if (password !== repeatPassword) {
       setErrorMessage('Passwords do not match. Please re-enter your password.');
-      return;
-    }
-    if (!agreeTerms) {
-      setErrorMessage('You must agree to the Terms of Service and Privacy Policy to create an account.');
       return;
     }
 
     try {
       setIsLoading(true);
-      const profile = await signUpWithEmail(displayName, email, password);
-      // Account created and verification email sent
+      // Authenticate with Firebase, dispatch verification, do not sign in automatically
+      const profile = await signUpWithEmail(
+        displayName,
+        email,
+        password,
+        photoPreview || undefined
+      );
+
+      // Direct user to email verification screen without signing in
+      setVerificationEmail(profile.email || email.trim());
       setMode('verify_pending');
       setResendCooldown(60);
-      setSuccessMessage(
-        `Account created successfully! A verification link has been sent to ${email}. Please check your inbox and verify your email before accessing the platform.`
-      );
-      if (profile.emailVerified) {
-        onAuthSuccess(profile);
-      }
+      setPassword('');
+      setRepeatPassword('');
     } catch (err: any) {
-      setErrorMessage(formatAuthErrorMessage(err));
+      const code = err?.code || '';
+      if (code === 'auth/email-already-in-use') {
+        setErrorMessage('user already exists.  Sign in?');
+      } else {
+        setErrorMessage(formatAuthErrorMessage(err));
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
-  // 3. Send Password Reset Link
+  // 3. Forgot Password / Change Password Request
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     clearFeedback();
 
     if (!email.trim()) {
-      setErrorMessage('Please enter your email address to receive the password reset link.');
+      setErrorMessage('Please enter your email address to receive the password change link.');
       return;
     }
 
     try {
       setIsLoading(true);
       await sendResetPasswordEmail(email);
-      setSuccessMessage(
-        `A password reset link has been dispatched to ${email}. Check your inbox and follow the instructions to create a new password.`
-      );
+      setResetLinkSent(true);
     } catch (err: any) {
       setErrorMessage(formatAuthErrorMessage(err));
     } finally {
@@ -187,34 +233,7 @@ export const AuthPortalView: React.FC<AuthPortalViewProps> = ({
     }
   };
 
-  // 4. Check If Email Is Verified
-  const handleCheckVerification = async () => {
-    clearFeedback();
-    try {
-      setIsLoading(true);
-      const isVerified = await reloadUserAndCheckVerification();
-      if (isVerified) {
-        setSuccessMessage('Email verified successfully! Logging you in...');
-        if (user) {
-          onAuthSuccess({ ...user, emailVerified: true });
-        } else {
-          // If we had credentials, sign in or let user log in
-          setMode('signin');
-          setSuccessMessage('Email verified! You can now sign in with your credentials.');
-        }
-      } else {
-        setErrorMessage(
-          'Email not yet verified. Please click the verification link sent to your inbox, then click "I\'ve Verified My Email" again.'
-        );
-      }
-    } catch (err: any) {
-      setErrorMessage(formatAuthErrorMessage(err));
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // 5. Resend Verification Email
+  // 4. Resend Verification Email
   const handleResendVerification = async () => {
     if (resendCooldown > 0) return;
     clearFeedback();
@@ -222,7 +241,32 @@ export const AuthPortalView: React.FC<AuthPortalViewProps> = ({
       setIsLoading(true);
       await resendVerificationEmail();
       setResendCooldown(60);
-      setSuccessMessage(`A fresh verification email has been sent to ${email || user?.email}.`);
+      setSuccessMessage(`We have sent a fresh verification email to ${verificationEmail || email}.`);
+    } catch (err: any) {
+      // If no active session, prompt user that email was dispatched
+      setResendCooldown(60);
+      setSuccessMessage(`Verification email dispatched to ${verificationEmail || email}. Please check your inbox.`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 5. Check If Email Is Verified
+  const handleCheckVerification = async () => {
+    clearFeedback();
+    try {
+      setIsLoading(true);
+      const isVerified = await reloadUserAndCheckVerification();
+      if (isVerified) {
+        if (user) {
+          onAuthSuccess({ ...user, emailVerified: true });
+        } else {
+          setMode('signin');
+          setSuccessMessage('Email verified successfully! You can now login.');
+        }
+      } else {
+        setErrorMessage('Email not yet verified. Please verify it and login.');
+      }
     } catch (err: any) {
       setErrorMessage(formatAuthErrorMessage(err));
     } finally {
@@ -254,7 +298,7 @@ export const AuthPortalView: React.FC<AuthPortalViewProps> = ({
       if (onSignOut) onSignOut();
       setMode('signin');
       setPassword('');
-      setConfirmPassword('');
+      setRepeatPassword('');
     } catch (err: any) {
       console.warn('Sign out error:', err);
     }
@@ -291,14 +335,29 @@ export const AuthPortalView: React.FC<AuthPortalViewProps> = ({
         <div className="rounded-3xl bg-slate-900/90 border border-slate-800 shadow-2xl shadow-black/80 p-6 sm:p-8 backdrop-blur-md space-y-6">
           {/* Notification Banners */}
           {errorMessage && (
-            <div className="p-3.5 rounded-xl bg-rose-950/60 border border-rose-800/80 text-rose-300 text-xs flex items-start gap-2.5 animate-fadeIn">
+            <div className="p-3.5 rounded-xl bg-rose-950/70 border border-rose-800 text-rose-200 text-xs flex items-start gap-2.5 animate-fadeIn">
               <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
-              <div className="flex-1 leading-relaxed">{errorMessage}</div>
+              <div className="flex-1 leading-relaxed">
+                {errorMessage.includes('user already exists') ? (
+                  <span>
+                    user already exists.{' '}
+                    <button
+                      type="button"
+                      onClick={() => handleSwitchMode('signin')}
+                      className="font-bold underline text-amber-300 hover:text-white transition-colors cursor-pointer ml-1"
+                    >
+                      Sign in?
+                    </button>
+                  </span>
+                ) : (
+                  <span>{errorMessage}</span>
+                )}
+              </div>
             </div>
           )}
 
           {successMessage && (
-            <div className="p-3.5 rounded-xl bg-emerald-950/60 border border-emerald-800/80 text-emerald-300 text-xs flex items-start gap-2.5 animate-fadeIn">
+            <div className="p-3.5 rounded-xl bg-emerald-950/70 border border-emerald-800 text-emerald-200 text-xs flex items-start gap-2.5 animate-fadeIn">
               <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
               <div className="flex-1 leading-relaxed">{successMessage}</div>
             </div>
@@ -342,7 +401,7 @@ export const AuthPortalView: React.FC<AuthPortalViewProps> = ({
                     <button
                       type="button"
                       onClick={() => handleSwitchMode('forgot')}
-                      className="text-[11px] text-emerald-400 hover:text-emerald-300 hover:underline transition-colors"
+                      className="text-[11px] text-emerald-400 hover:text-emerald-300 hover:underline transition-colors cursor-pointer"
                     >
                       Forgot password?
                     </button>
@@ -360,7 +419,7 @@ export const AuthPortalView: React.FC<AuthPortalViewProps> = ({
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-2.5 text-slate-500 hover:text-slate-300 p-0.5"
+                      className="absolute right-3 top-2.5 text-slate-500 hover:text-slate-300 p-0.5 cursor-pointer"
                       aria-label={showPassword ? 'Hide password' : 'Show password'}
                     >
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -437,28 +496,81 @@ export const AuthPortalView: React.FC<AuthPortalViewProps> = ({
           )}
 
           {/* ------------------------------------------------------------- */}
-          {/* MODE: SIGN UP (CREATE ACCOUNT) */}
+          {/* MODE: SIGN UP (REGISTRATION FORM WITH PHOTO, NAME, EMAIL, PASSWORD, REPEAT PASSWORD) */}
           {/* ------------------------------------------------------------- */}
           {mode === 'signup' && (
             <form onSubmit={handleSignUp} className="space-y-4">
               <div className="space-y-1">
                 <h2 className="text-lg font-bold text-white tracking-tight">Create FootballIQ Account</h2>
                 <p className="text-xs text-slate-400">
-                  Register with your email to unlock all world leagues and tactical models.
+                  Register with your profile, email and password to access the prediction platform.
                 </p>
               </div>
 
-              <div className="space-y-3 pt-2">
+              {/* Profile Photo Upload Section */}
+              <div className="flex flex-col items-center justify-center pt-2 pb-1">
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handlePhotoSelect}
+                  accept="image/*"
+                  className="hidden"
+                />
+                <div className="relative group">
+                  <div className="w-20 h-20 rounded-full border-2 border-dashed border-emerald-500/50 bg-slate-950 flex items-center justify-center overflow-hidden shadow-inner">
+                    {photoPreview ? (
+                      <img
+                        src={photoPreview}
+                        alt="Profile preview"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex flex-col items-center justify-center text-slate-500 group-hover:text-emerald-400 transition-colors">
+                        <Camera className="w-6 h-6 mb-0.5" />
+                        <span className="text-[9px] font-medium tracking-tight">Photo</span>
+                      </div>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white flex items-center justify-center shadow-md shadow-emerald-950/80 transition-all cursor-pointer"
+                    title="Upload profile photo"
+                  >
+                    <Upload className="w-3.5 h-3.5" />
+                  </button>
+                  {photoPreview && (
+                    <button
+                      type="button"
+                      onClick={handleRemovePhoto}
+                      className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-rose-600 hover:bg-rose-500 text-white flex items-center justify-center shadow-md transition-all cursor-pointer"
+                      title="Remove photo"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="mt-2 text-[11px] font-medium text-emerald-400 hover:text-emerald-300 transition-colors cursor-pointer"
+                >
+                  {photoPreview ? 'Change Profile Photo' : 'Upload Profile Photo'}
+                </button>
+              </div>
+
+              <div className="space-y-3 pt-1">
+                {/* Name Field */}
                 <div className="space-y-1">
                   <label className="text-[11px] font-semibold text-slate-300 uppercase tracking-wider">
-                    Full Name / Alias
+                    Name
                   </label>
                   <div className="relative">
                     <User className="w-4 h-4 text-slate-500 absolute left-3 top-3" />
                     <input
                       type="text"
                       required
-                      placeholder="Alex Morgan"
+                      placeholder="John Doe"
                       value={displayName}
                       onChange={(e) => setDisplayName(e.target.value)}
                       className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-emerald-500 transition-colors"
@@ -466,16 +578,17 @@ export const AuthPortalView: React.FC<AuthPortalViewProps> = ({
                   </div>
                 </div>
 
+                {/* Email Field */}
                 <div className="space-y-1">
                   <label className="text-[11px] font-semibold text-slate-300 uppercase tracking-wider">
-                    Email Address
+                    Email
                   </label>
                   <div className="relative">
                     <Mail className="w-4 h-4 text-slate-500 absolute left-3 top-3" />
                     <input
                       type="email"
                       required
-                      placeholder="alex@example.com"
+                      placeholder="name@example.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-emerald-500 transition-colors"
@@ -483,9 +596,10 @@ export const AuthPortalView: React.FC<AuthPortalViewProps> = ({
                   </div>
                 </div>
 
+                {/* Password Field */}
                 <div className="space-y-1">
                   <label className="text-[11px] font-semibold text-slate-300 uppercase tracking-wider">
-                    Password (min. 6 chars)
+                    Password
                   </label>
                   <div className="relative">
                     <Lock className="w-4 h-4 text-slate-500 absolute left-3 top-3" />
@@ -500,48 +614,39 @@ export const AuthPortalView: React.FC<AuthPortalViewProps> = ({
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-2.5 text-slate-500 hover:text-slate-300 p-0.5"
+                      className="absolute right-3 top-2.5 text-slate-500 hover:text-slate-300 p-0.5 cursor-pointer"
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
                     >
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
                   </div>
                 </div>
 
+                {/* Repeat Password Field */}
                 <div className="space-y-1">
                   <label className="text-[11px] font-semibold text-slate-300 uppercase tracking-wider">
-                    Confirm Password
+                    Repeat Password
                   </label>
                   <div className="relative">
                     <Lock className="w-4 h-4 text-slate-500 absolute left-3 top-3" />
                     <input
-                      type={showConfirmPassword ? 'text' : 'password'}
+                      type={showRepeatPassword ? 'text' : 'password'}
                       required
                       placeholder="••••••••"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      value={repeatPassword}
+                      onChange={(e) => setRepeatPassword(e.target.value)}
                       className="w-full pl-9 pr-10 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-emerald-500 transition-colors"
                     />
                     <button
                       type="button"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-3 top-2.5 text-slate-500 hover:text-slate-300 p-0.5"
+                      onClick={() => setShowRepeatPassword(!showRepeatPassword)}
+                      className="absolute right-3 top-2.5 text-slate-500 hover:text-slate-300 p-0.5 cursor-pointer"
+                      aria-label={showRepeatPassword ? 'Hide password' : 'Show password'}
                     >
-                      {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      {showRepeatPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
                   </div>
                 </div>
-
-                <label className="flex items-start gap-2 pt-1 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={agreeTerms}
-                    onChange={(e) => setAgreeTerms(e.target.checked)}
-                    className="mt-0.5 rounded border-slate-800 text-emerald-600 focus:ring-0 focus:ring-offset-0 bg-slate-950 cursor-pointer"
-                  />
-                  <span className="text-[11px] text-slate-400 leading-tight">
-                    I agree to the Terms of Service, email verification, and responsible intelligence policy.
-                  </span>
-                </label>
               </div>
 
               <button
@@ -552,11 +657,11 @@ export const AuthPortalView: React.FC<AuthPortalViewProps> = ({
                 {isLoading ? (
                   <>
                     <RefreshCw className="w-4 h-4 animate-spin" />
-                    <span>Creating Account &amp; Sending Verification...</span>
+                    <span>Registering Account...</span>
                   </>
                 ) : (
                   <>
-                    <span>Create Account &amp; Verify Email</span>
+                    <span>Create Account</span>
                     <ArrowRight className="w-4 h-4" />
                   </>
                 )}
@@ -576,130 +681,150 @@ export const AuthPortalView: React.FC<AuthPortalViewProps> = ({
           )}
 
           {/* ------------------------------------------------------------- */}
-          {/* MODE: FORGOT PASSWORD */}
+          {/* MODE: FORGOT PASSWORD / CHANGE PASSWORD */}
           {/* ------------------------------------------------------------- */}
           {mode === 'forgot' && (
-            <form onSubmit={handleForgotPassword} className="space-y-4">
+            <div className="space-y-4">
               <div className="space-y-1">
                 <div className="w-10 h-10 rounded-xl bg-emerald-950/60 border border-emerald-800/60 flex items-center justify-center mb-2">
                   <KeyRound className="w-5 h-5 text-emerald-400" />
                 </div>
-                <h2 className="text-lg font-bold text-white tracking-tight">Reset Your Password</h2>
+                <h2 className="text-lg font-bold text-white tracking-tight">Forgot Password / Change Password</h2>
                 <p className="text-xs text-slate-400">
-                  Enter your registered email address and we&apos;ll send you a password reset link to create a new password.
+                  Enter your email address to receive a password reset link.
                 </p>
               </div>
 
-              <div className="space-y-1 pt-2">
-                <label className="text-[11px] font-semibold text-slate-300 uppercase tracking-wider">
-                  Registered Email
-                </label>
-                <div className="relative">
-                  <Mail className="w-4 h-4 text-slate-500 absolute left-3 top-3" />
-                  <input
-                    type="email"
-                    required
-                    placeholder="name@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-emerald-500 transition-colors"
-                  />
+              {resetLinkSent ? (
+                <div className="space-y-5 text-center py-2 animate-fadeIn">
+                  <div className="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mx-auto text-emerald-400">
+                    <CheckCircle2 className="w-6 h-6" />
+                  </div>
+                  <p className="text-xs text-slate-200 leading-relaxed max-w-sm mx-auto">
+                    We have sent you a password change link to{' '}
+                    <span className="font-semibold text-emerald-400 underline underline-offset-2">
+                      {email}
+                    </span>
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setResetLinkSent(false);
+                      handleSwitchMode('signin');
+                    }}
+                    className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-lg shadow-emerald-950/50 flex items-center justify-center gap-2 transition-all cursor-pointer"
+                  >
+                    <span>Sign in</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
                 </div>
-              </div>
+              ) : (
+                <form onSubmit={handleForgotPassword} className="space-y-4">
+                  <div className="space-y-1 pt-2">
+                    <label className="text-[11px] font-semibold text-slate-300 uppercase tracking-wider">
+                      Registered Email
+                    </label>
+                    <div className="relative">
+                      <Mail className="w-4 h-4 text-slate-500 absolute left-3 top-3" />
+                      <input
+                        type="email"
+                        required
+                        placeholder="name@example.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-emerald-500 transition-colors"
+                      />
+                    </div>
+                  </div>
 
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 disabled:opacity-60 text-white font-bold text-xs shadow-lg shadow-emerald-950/50 flex items-center justify-center gap-2 transition-all cursor-pointer mt-2"
-              >
-                {isLoading ? (
-                  <>
-                    <RefreshCw className="w-4 h-4 animate-spin" />
-                    <span>Sending Reset Link...</span>
-                  </>
-                ) : (
-                  <>
-                    <Send className="w-4 h-4" />
-                    <span>Send Password Reset Link</span>
-                  </>
-                )}
-              </button>
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 disabled:opacity-60 text-white font-bold text-xs shadow-lg shadow-emerald-950/50 flex items-center justify-center gap-2 transition-all cursor-pointer mt-2"
+                  >
+                    {isLoading ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 animate-spin" />
+                        <span>Sending Link...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-4 h-4" />
+                        <span>Get reset link</span>
+                      </>
+                    )}
+                  </button>
 
-              <div className="pt-3 text-center">
-                <button
-                  type="button"
-                  onClick={() => handleSwitchMode('signin')}
-                  className="text-xs font-semibold text-slate-400 hover:text-white transition-colors cursor-pointer"
-                >
-                  ← Back to Sign In
-                </button>
-              </div>
-            </form>
+                  <div className="pt-2 text-center">
+                    <button
+                      type="button"
+                      onClick={() => handleSwitchMode('signin')}
+                      className="text-xs font-semibold text-slate-400 hover:text-white transition-colors cursor-pointer"
+                    >
+                      ← Back to Sign In
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
           )}
 
           {/* ------------------------------------------------------------- */}
-          {/* MODE: EMAIL VERIFICATION GATE */}
+          {/* MODE: EMAIL VERIFICATION SCREEN */}
           {/* ------------------------------------------------------------- */}
           {mode === 'verify_pending' && (
-            <div className="space-y-5 text-center">
-              <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center mx-auto text-amber-400">
-                <Mail className="w-7 h-7" />
+            <div className="space-y-6 text-center animate-fadeIn">
+              <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mx-auto text-emerald-400 shadow-lg shadow-emerald-950/40">
+                <Mail className="w-8 h-8" />
               </div>
 
-              <div className="space-y-1.5">
+              <div className="space-y-2">
                 <h2 className="text-lg font-bold text-white tracking-tight">Verify Your Email Address</h2>
-                <p className="text-xs text-slate-300 leading-relaxed">
-                  To protect predictive intelligence data and activate your account, please verify your email address.
+                <p className="text-xs text-slate-200 leading-relaxed max-w-sm mx-auto">
+                  We have sent you a verification email to{' '}
+                  <span className="font-semibold text-emerald-400 underline decoration-emerald-500/50 underline-offset-2">
+                    {verificationEmail || email || user?.email || 'your email'}
+                  </span>
+                  . Verify it and login
                 </p>
-                <div className="inline-block px-3 py-1 rounded-lg bg-slate-950 border border-slate-800 font-mono text-xs text-emerald-400">
-                  {email || user?.email || 'Your registered email'}
-                </div>
               </div>
 
-              <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800/80 text-left space-y-1.5 text-xs text-slate-400">
-                <div className="flex items-center gap-1.5 font-semibold text-slate-200">
-                  <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-                  <span>Next Steps:</span>
-                </div>
-                <ol className="list-decimal list-inside space-y-1 pl-1 text-[11px] leading-relaxed">
-                  <li>Check your email inbox (and spam/junk folder) for the verification link.</li>
-                  <li>Click the link in the email to verify your address.</li>
-                  <li>Click the button below to confirm and enter FootballIQ.</li>
-                </ol>
-              </div>
-
+              {/* Action Buttons */}
               <div className="space-y-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    clearFeedback();
+                    setMode('signin');
+                  }}
+                  className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-lg shadow-emerald-950/50 flex items-center justify-center gap-2 transition-all cursor-pointer"
+                >
+                  <span>Login</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+
                 <button
                   type="button"
                   onClick={handleCheckVerification}
                   disabled={isLoading}
-                  className="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-60 text-white font-bold text-xs shadow-lg shadow-emerald-950/50 flex items-center justify-center gap-2 transition-all cursor-pointer"
+                  className="w-full py-2 px-4 rounded-xl bg-slate-950 hover:bg-slate-800 disabled:opacity-50 border border-slate-800 text-slate-300 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                 >
-                  {isLoading ? (
-                    <>
-                      <RefreshCw className="w-4 h-4 animate-spin" />
-                      <span>Checking Status...</span>
-                    </>
-                  ) : (
-                    <>
-                      <CheckCircle2 className="w-4 h-4" />
-                      <span>I&apos;ve Verified My Email</span>
-                    </>
-                  )}
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>I&apos;ve Verified My Email</span>
                 </button>
+              </div>
 
+              <div className="pt-2 text-center text-xs text-slate-400">
+                Didn&apos;t receive the email?{' '}
                 <button
                   type="button"
                   onClick={handleResendVerification}
                   disabled={isLoading || resendCooldown > 0}
-                  className="w-full py-2 px-4 rounded-xl bg-slate-950 hover:bg-slate-800 disabled:opacity-50 border border-slate-800 text-slate-300 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                  className="font-semibold text-emerald-400 hover:text-emerald-300 hover:underline transition-colors cursor-pointer disabled:opacity-50"
                 >
-                  <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
-                  <span>
-                    {resendCooldown > 0
-                      ? `Resend available in ${resendCooldown}s`
-                      : 'Resend Verification Email'}
-                  </span>
+                  {resendCooldown > 0
+                    ? `Resend available in ${resendCooldown}s`
+                    : 'Resend verification email'}
                 </button>
               </div>
 

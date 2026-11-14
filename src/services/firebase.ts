@@ -314,24 +314,55 @@ export async function syncUserProfile(user: FirebaseUser): Promise<UserProfile> 
 
 /**
  * Sign in using Email and Password
+ * If the email is unverified, re-dispatches verification email, signs out,
+ * and returns unverified profile so the verification screen can be shown.
  */
 export async function signInWithEmail(email: string, pass: string): Promise<UserProfile> {
   const cred = await signInWithEmailAndPassword(auth, email.trim(), pass);
+  const isVerified = Boolean(cred.user.emailVerified);
+  if (!isVerified) {
+    try {
+      await sendEmailVerification(cred.user);
+    } catch (verErr) {
+      console.warn('sendEmailVerification notification issue on sign-in:', verErr);
+    }
+    await fbSignOut(auth);
+    return {
+      uid: cred.user.uid,
+      email: cred.user.email || email.trim(),
+      displayName: cred.user.displayName || email.split('@')[0],
+      photoURL: cred.user.photoURL || '',
+      role: 'user',
+      timezone: 'Africa/Kampala',
+      createdAt: new Date().toISOString(),
+      emailVerified: false,
+    };
+  }
   return await syncUserProfile(cred.user);
 }
 
 /**
- * Create a new account with Display Name, Email, and Password.
- * Automatically dispatches Firebase email verification to the registered address.
+ * Create a new account with Display Name, Email, Password, and optional Profile Photo.
+ * Authenticates with Firebase Auth, updates profile metadata, dispatches email verification,
+ * and immediately signs out so the user is NOT signed in automatically.
+ * Does not write to external user info collections for now.
  */
-export async function signUpWithEmail(displayName: string, email: string, pass: string): Promise<UserProfile> {
+export async function signUpWithEmail(
+  displayName: string,
+  email: string,
+  pass: string,
+  photoURL?: string
+): Promise<UserProfile> {
   const cred = await createUserWithEmailAndPassword(auth, email.trim(), pass);
   
-  if (displayName.trim()) {
+  if (displayName.trim() || photoURL) {
     try {
-      await updateProfile(cred.user, { displayName: displayName.trim() });
+      await updateProfile(cred.user, {
+        displayName: displayName.trim() || undefined,
+        photoURL: photoURL || undefined,
+      });
     } catch (err) {
-      console.warn('Failed to update displayName on profile:', err);
+      console.warn('Failed to update displayName/photoURL on profile:', err);
     }
   }
 
@@ -342,7 +373,19 @@ export async function signUpWithEmail(displayName: string, email: string, pass: 
     console.warn('sendEmailVerification notification issue:', verErr);
   }
 
-  return await syncUserProfile(cred.user);
+  // Do not sign user in automatically; sign out immediately
+  await fbSignOut(auth);
+
+  return {
+    uid: cred.user.uid,
+    email: cred.user.email || email.trim(),
+    displayName: displayName.trim() || email.split('@')[0],
+    photoURL: photoURL || '',
+    role: 'user',
+    timezone: 'Africa/Kampala',
+    createdAt: new Date().toISOString(),
+    emailVerified: false,
+  };
 }
 
 /**
@@ -387,9 +430,9 @@ export function formatAuthErrorMessage(error: any): string {
     case 'auth/user-not-found':
     case 'auth/wrong-password':
     case 'auth/invalid-credential':
-      return 'Invalid email or password. Please verify your credentials and try again.';
+      return 'password or email incorrect ';
     case 'auth/email-already-in-use':
-      return 'An account already exists with this email address. Please sign in instead.';
+      return 'user already exists.  Sign in?';
     case 'auth/weak-password':
       return 'Password is too weak. Please use at least 6 characters with mixed characters.';
     case 'auth/too-many-requests':

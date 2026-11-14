@@ -371,11 +371,11 @@ async function runTests() {
     'formatAuthErrorMessage translates auth/invalid-email'
   );
   assert(
-    formatAuthErrorMessage({ code: 'auth/wrong-password' }).includes('Invalid email or password'),
+    formatAuthErrorMessage({ code: 'auth/wrong-password' }).toLowerCase().includes('password or email incorrect'),
     'formatAuthErrorMessage translates auth/wrong-password to safe credential error'
   );
   assert(
-    formatAuthErrorMessage({ code: 'auth/email-already-in-use' }).includes('already exists'),
+    formatAuthErrorMessage({ code: 'auth/email-already-in-use' }).includes('user already exists'),
     'formatAuthErrorMessage translates auth/email-already-in-use'
   );
   assert(
@@ -431,8 +431,9 @@ async function runTests() {
   );
   assert(
     signupHtml.includes('Create FootballIQ Account') &&
-      signupHtml.includes('Full Name / Alias') &&
-      signupHtml.includes('Confirm Password') &&
+      signupHtml.includes('Name') &&
+      signupHtml.includes('Repeat Password') &&
+      signupHtml.includes('Upload Profile Photo') &&
       signupHtml.includes('Create Account') &&
       !signupHtml.toLowerCase().includes('admin'),
     'AuthPortalView renders authentic Sign Up mode with zero admin details or mentions'
@@ -445,7 +446,7 @@ async function runTests() {
     })
   );
   assert(
-    forgotHtml.includes('Reset Your Password') && forgotHtml.includes('Send Password Reset Link'),
+    forgotHtml.includes('Forgot Password') && forgotHtml.includes('Get reset link'),
     'AuthPortalView renders Password Reset request view with reset link action'
   );
 
@@ -468,7 +469,9 @@ async function runTests() {
   assert(
     verifyHtml.includes('Verify Your Email Address') &&
       verifyHtml.includes('analyst@example.com') &&
-      verifyHtml.includes('Verified My Email') &&
+      verifyHtml.includes('We have sent you a verification email to') &&
+      verifyHtml.includes('Verify it and login') &&
+      verifyHtml.includes('Login') &&
       !verifyHtml.toLowerCase().includes('admin'),
     'AuthPortalView gates unverified accounts with mandatory email verification screen with zero admin mentions'
   );
