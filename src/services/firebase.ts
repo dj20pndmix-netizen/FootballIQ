@@ -25,18 +25,43 @@ import {
   orderBy,
   limit,
 } from 'firebase/firestore';
-import firebaseConfig from '../../firebase-applet-config.json';
+import rawFirebaseConfig from '../../firebase-applet-config.json';
 import { Fixture, PersistedFixtureUpdate, SyncJobRecord, FixtureStatus } from '../types/football';
+import { getAnalytics, isSupported } from 'firebase/analytics';
 
-// Initialize Firebase
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+// Active Firebase Configuration
+export const firebaseConfig = {
+  apiKey: "AIzaSyBQwccJIpSYDBK3RNrmOEg4YCWTDj9vCYw",
+  authDomain: "footballiq-697ba.firebaseapp.com",
+  projectId: "footballiq-697ba",
+  storageBucket: "footballiq-697ba.firebasestorage.app",
+  messagingSenderId: "646359014282",
+  appId: "1:646359014282:web:25c31846eccdcf92ee8673",
+  measurementId: "G-4SNSL99ZEJ",
+  ...(rawFirebaseConfig || {}),
+};
+
+// Initialize Firebase App
+export const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
 // Initialize Firestore: supports both standard default database and custom database IDs
 export const db = (firebaseConfig as any).firestoreDatabaseId && (firebaseConfig as any).firestoreDatabaseId !== '(default)'
   ? getFirestore(app, (firebaseConfig as any).firestoreDatabaseId)
   : getFirestore(app);
+
+// Initialize Firebase Authentication & Providers
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
+
+// Initialize Analytics (safely isolated for browser environments)
+export let analytics: any = null;
+if (typeof window !== 'undefined') {
+  isSupported().then((supported) => {
+    if (supported) {
+      analytics = getAnalytics(app);
+    }
+  }).catch(() => {});
+}
 
 export enum OperationType {
   CREATE = 'create',

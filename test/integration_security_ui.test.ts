@@ -33,6 +33,7 @@ import {
   isAuthorizedAdminEmail,
   computeSha256,
   signInWithGoogle,
+  firebaseConfig,
 } from '../src/services/firebase.ts';
 
 let passed = 0;
@@ -366,6 +367,15 @@ async function runTests() {
   // 4. Authentication, Account Creation & Password Reset Component Tests
   // -------------------------------------------------------------------------
   console.log('\n--- 4. Authentication, Account Creation, Verification & Reset Portal Tests ---');
+  assert(
+    firebaseConfig.projectId === 'footballiq-697ba' &&
+      firebaseConfig.authDomain === 'footballiq-697ba.firebaseapp.com' &&
+      firebaseConfig.storageBucket === 'footballiq-697ba.firebasestorage.app' &&
+      firebaseConfig.apiKey === 'AIzaSyBQwccJIpSYDBK3RNrmOEg4YCWTDj9vCYw' &&
+      firebaseConfig.appId === '1:646359014282:web:25c31846eccdcf92ee8673' &&
+      firebaseConfig.measurementId === 'G-4SNSL99ZEJ',
+    'Firebase configuration matches official footballiq-697ba project specifications'
+  );
   assert(
     formatAuthErrorMessage({ code: 'auth/invalid-email' }).includes('invalid'),
     'formatAuthErrorMessage translates auth/invalid-email'

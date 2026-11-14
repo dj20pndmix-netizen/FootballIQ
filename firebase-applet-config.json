@@ -1,12 +1,9 @@
 {
-  "projectId": "footballiq-697ba",
-  "appId": "1:646359014282:web:25c31846eccdcf92ee8673",
   "apiKey": "AIzaSyBQwccJIpSYDBK3RNrmOEg4YCWTDj9vCYw",
   "authDomain": "footballiq-697ba.firebaseapp.com",
-  "firestoreDatabaseId": "(default)",
+  "projectId": "footballiq-697ba",
   "storageBucket": "footballiq-697ba.firebasestorage.app",
   "messagingSenderId": "646359014282",
-  "measurementId": "G-4SNSL99ZEJ",
-  "oAuthClientId": "",
-  "recaptchaSiteKey": ""
+  "appId": "1:646359014282:web:25c31846eccdcf92ee8673",
+  "measurementId": "G-4SNSL99ZEJ"
 }
