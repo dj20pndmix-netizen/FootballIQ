@@ -117,7 +117,7 @@ describe('Phase 10 Verification: Scheduling, Live Results, Automatic Settlement 
           probabilities: { HH: 0.35, HD: 0.05, HA: 0.02, DH: 0.15, DD: 0.20, DA: 0.08, AH: 0.03, AD: 0.04, AA: 0.08 },
           predictedOutcome: 'HH',
         },
-        marketInterval10: {
+        market1X2Interval10: {
           predictedOutcome: 'X',
           intervalProbabilities: { homeLeading: 0.12, draw: 0.80, awayLeading: 0.08 },
         },

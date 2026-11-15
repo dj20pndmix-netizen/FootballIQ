@@ -218,9 +218,23 @@ export function gradeFixtureSettlement(
 
   // 6. 10-Minute Interval 00:01 - 09:59 (if present)
   if (pred.market1X2Interval10) {
-    // If score was 0-0 at 10 minutes (typical), outcome is 'X'
-    // If half-time score was 0-0, 10' score was guaranteed 0-0 ('X')
-    if (hasValidHt && htH === 0 && htA === 0) {
+    if (typeof scores?.interval10Home === 'number' && typeof scores?.interval10Away === 'number') {
+      const actualInt =
+        scores.interval10Home > scores.interval10Away
+          ? '1'
+          : scores.interval10Home === scores.interval10Away
+          ? 'X'
+          : '2';
+      const wonInt = pred.market1X2Interval10.predictedOutcome === actualInt;
+      settledMarkets.market1X2Interval10 = wonInt ? 'WON' : 'LOST';
+      auditTrail.push({
+        marketKey: '1X2_INTERVAL_10',
+        pick: pred.market1X2Interval10.predictedOutcome,
+        outcome: settledMarkets.market1X2Interval10,
+        actualValue: `${actualInt} (${scores.interval10Home}-${scores.interval10Away})`,
+        reason: `Verified 10m interval score ${scores.interval10Home}-${scores.interval10Away}.`,
+      });
+    } else if (hasValidHt && htH === 0 && htA === 0) {
       const wonInt = pred.market1X2Interval10.predictedOutcome === 'X';
       settledMarkets.market1X2Interval10 = wonInt ? 'WON' : 'LOST';
       auditTrail.push({
