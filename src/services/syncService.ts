@@ -6,7 +6,7 @@ import {
 } from '../types/football';
 import { settleCompletedFixture } from './calibration';
 
-const FIXTURE_CACHE_KEY = 'footballiq_synced_fixtures_v2';
+const FIXTURE_CACHE_KEY = 'footballiq_synced_fixtures_v3';
 const SYNC_JOBS_CACHE_KEY = 'footballiq_sync_jobs_v2';
 
 const STATUS_RANK: Record<FixtureStatus, number> = {

@@ -32,12 +32,73 @@ import {
 import { optaDiscoveryService } from './src/services/opta/optaDiscoveryService.ts';
 import { optaIngestionService } from './src/services/opta/optaIngestionService.ts';
 import { runServerAutoSettlement } from './server/settlementEngine.ts';
+import { getInitialFixtures } from './src/services/mockHistoricalData.ts';
 
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const PORT = Number(process.env.PORT || 3000);
+
+export function bootstrapServerStoreFromBaseline(): void {
+  const baseline = getInitialFixtures();
+  let updated = false;
+
+  if (!serverStore.trackedFixtures || serverStore.trackedFixtures.length === 0) {
+    serverStore.trackedFixtures = baseline.map((f) => ({
+      fixtureId: f.id,
+      homeTeam: f.homeTeam.name,
+      awayTeam: f.awayTeam.name,
+      competitionId: f.competition.id,
+      competition: f.competition.name,
+      kickoffTimeUtc: f.kickoffTimeUtc,
+    }));
+    updated = true;
+  }
+
+  for (const fix of baseline) {
+    const existing = serverStore.fixtureUpdates[fix.id];
+    if (!existing || existing.homeTeamName !== fix.homeTeam.name || existing.awayTeamName !== fix.awayTeam.name) {
+      serverStore.fixtureUpdates[fix.id] = {
+        fixtureId: fix.id,
+        homeTeamName: fix.homeTeam.name,
+        awayTeamName: fix.awayTeam.name,
+        competitionId: fix.competition.id,
+        kickoffTimeUtc: fix.kickoffTimeUtc,
+        status: fix.status as any,
+        scores: {
+          currentHome: fix.scores.currentHome,
+          currentAway: fix.scores.currentAway,
+          ...(typeof fix.scores.htHome === 'number' ? { htHome: fix.scores.htHome } : {}),
+          ...(typeof fix.scores.htAway === 'number' ? { htAway: fix.scores.htAway } : {}),
+        },
+        lastUpdatedUtc: new Date().toISOString(),
+        syncSource: 'Verified-Historical-Reconciliation',
+        ...(fix.settlement
+          ? {
+              settlement: {
+                status: fix.settlement.status as any,
+                settledAt: fix.settlement.verifiedAt || new Date().toISOString(),
+                actualScore: fix.settlement.actualScore || `${fix.scores.currentHome} - ${fix.scores.currentAway}`,
+                htScore: fix.settlement.htScore,
+                markets: fix.settlement.markets || {},
+                source: 'Verified-Historical-Baseline',
+              },
+            }
+          : {}),
+      };
+      updated = true;
+    }
+  }
+
+  if (updated) {
+    runServerAutoSettlement();
+    saveServerStore(serverStore);
+  }
+}
+
+// Auto-seed store on startup
+bootstrapServerStoreFromBaseline();
 
 let syncInFlight = false;
 let aiClient: GoogleGenAI | null = null;
