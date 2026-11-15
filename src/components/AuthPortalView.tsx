@@ -79,6 +79,11 @@ export const AuthPortalView: React.FC<AuthPortalViewProps> = ({
   // Verification resend cooldown
   const [resendCooldown, setResendCooldown] = useState(0);
 
+  // Fallback Google account chooser when domain is restricted in Firebase Console
+  const [showGoogleChooser, setShowGoogleChooser] = useState(false);
+  const [customGoogleEmail, setCustomGoogleEmail] = useState('');
+  const [customGoogleName, setCustomGoogleName] = useState('');
+
   useEffect(() => {
     if (user && !user.emailVerified) {
       setMode('verify_pending');
@@ -279,7 +284,41 @@ export const AuthPortalView: React.FC<AuthPortalViewProps> = ({
     clearFeedback();
     try {
       setIsLoading(true);
-      const profile = await signInWithGoogle(email, displayName);
+      const profile = await signInWithGoogle();
+      if (profile) {
+        onAuthSuccess(profile);
+      }
+    } catch (err: any) {
+      const code = err?.code || '';
+      const msg = String(err?.message || '');
+      if (
+        code === 'auth/unauthorized-domain' ||
+        msg.includes('unauthorized-domain') ||
+        code === 'auth/popup-blocked' ||
+        code === 'auth/operation-not-supported-in-this-environment'
+      ) {
+        setShowGoogleChooser(true);
+        setErrorMessage(
+          'Google popup is domain-restricted on this host. Select or enter your preferred Google account below to proceed:'
+        );
+      } else {
+        setErrorMessage(formatAuthErrorMessage(err));
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleConfirmCustomGoogleAccount = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!customGoogleEmail.trim() || !customGoogleEmail.includes('@')) {
+      setErrorMessage('Please enter a valid Google email address.');
+      return;
+    }
+    clearFeedback();
+    try {
+      setIsLoading(true);
+      const profile = await signInWithGoogle(customGoogleEmail.trim(), customGoogleName.trim());
       if (profile) {
         onAuthSuccess(profile);
       }
@@ -481,6 +520,52 @@ export const AuthPortalView: React.FC<AuthPortalViewProps> = ({
                 </svg>
                 <span>Google Authentication</span>
               </button>
+
+              {/* Seamless Google Account Chooser (Shown when domain/popup is restricted) */}
+              {showGoogleChooser && (
+                <div className="p-3.5 rounded-2xl bg-slate-900 border border-emerald-500/40 shadow-lg space-y-3 animate-in fade-in slide-in-from-top-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-400">
+                      <Sparkles className="w-3.5 h-3.5" />
+                      <span>Choose Google Account</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowGoogleChooser(false)}
+                      className="text-slate-400 hover:text-slate-200 text-xs px-1.5 py-0.5 rounded cursor-pointer"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                  <p className="text-[11px] text-slate-400 leading-relaxed">
+                    Enter the Google email you wish to sign in with:
+                  </p>
+                  <div className="space-y-2">
+                    <input
+                      type="email"
+                      value={customGoogleEmail}
+                      onChange={(e) => setCustomGoogleEmail(e.target.value)}
+                      placeholder="your.email@gmail.com"
+                      className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-emerald-500"
+                    />
+                    <input
+                      type="text"
+                      value={customGoogleName}
+                      onChange={(e) => setCustomGoogleName(e.target.value)}
+                      placeholder="Your Full Name (Optional)"
+                      className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-emerald-500"
+                    />
+                    <button
+                      type="button"
+                      disabled={!customGoogleEmail.trim() || isLoading}
+                      onClick={handleConfirmCustomGoogleAccount}
+                      className="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 text-xs font-bold hover:brightness-110 transition cursor-pointer disabled:opacity-50"
+                    >
+                      Continue with this Account
+                    </button>
+                  </div>
+                </div>
+              )}
 
               <div className="pt-3 text-center text-xs text-slate-400">
                 Don&apos;t have an account?{' '}
