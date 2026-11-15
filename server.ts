@@ -841,6 +841,61 @@ Return ONLY a valid JSON object (no markdown fences if possible) with these fiel
     }
   });
 
+  // 2c. Automated Match Settlement & Reconciliation Engine
+  app.post('/api/settlement/reconcile', syncRateLimiter, async (_req, res) => {
+    try {
+      const summary = runServerAutoSettlement();
+      res.json({
+        success: true,
+        data: {
+          summary,
+          lastAutoSyncAt: serverStore.lastAutoSyncAt,
+          totalTracked: serverStore.trackedFixtures.length,
+          totalUpdates: Object.keys(serverStore.fixtureUpdates).length,
+        },
+      });
+    } catch (err: any) {
+      res.status(500).json({
+        success: false,
+        error: err.message || 'Failed to reconcile match settlements',
+      });
+    }
+  });
+
+  app.get('/api/settlement/status', syncRateLimiter, (_req, res) => {
+    try {
+      const updates = Object.values(serverStore.fixtureUpdates);
+      const settled = updates.filter(
+        (u) => u.settlement && (u.settlement.status === 'WON' || u.settlement.status === 'LOST')
+      );
+      const voided = updates.filter((u) => u.settlement?.status === 'VOID');
+      const pending = updates.filter((u) => !u.settlement || u.settlement.status === 'PENDING');
+      const won = settled.filter((u) => u.settlement?.status === 'WON').length;
+      const lost = settled.filter((u) => u.settlement?.status === 'LOST').length;
+      const settledTotal = won + lost;
+      const accuracyPct = settledTotal > 0 ? Number(((won / settledTotal) * 100).toFixed(1)) : 0;
+
+      res.json({
+        success: true,
+        data: {
+          totalTracked: updates.length,
+          settledTotal,
+          won,
+          lost,
+          voided: voided.length,
+          pending: pending.length,
+          accuracyPct,
+          lastAutoSyncAt: serverStore.lastAutoSyncAt,
+        },
+      });
+    } catch (err: any) {
+      res.status(500).json({
+        success: false,
+        error: err.message || 'Failed to retrieve settlement status',
+      });
+    }
+  });
+
   // 3. Server-side SportMonks Connectivity Proxy
   app.post('/api/sportmonks/status', syncRateLimiter, async (req, res) => {
     const start = Date.now();
@@ -1339,6 +1394,7 @@ async function startServer() {
     }).catch((err) => {
       console.warn('Background auto-sync cycle skipped:', err?.message || err);
     });
+    runServerAutoSettlement();
   }, AUTO_SYNC_INTERVAL_MS);
 
   const shutdown = (signal: string) => {
