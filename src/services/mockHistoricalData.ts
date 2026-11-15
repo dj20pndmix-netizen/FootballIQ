@@ -2718,143 +2718,145 @@ const RAW_FIXTURES: Omit<Fixture, 'prediction'>[] = [
   // =========================================================================
   // 1-10: BASELINE MATCHDAY FIXTURES (PRESERVED IN EXACT POSITIONS)
   // =========================================================================
-  // 1. Kosovo vs Israel (UEFA Nations League)
+  // 1-10: BASELINE MATCHDAY FIXTURES (OFFICIAL 15 NOVEMBER 2026 SLATE)
+  // =========================================================================
+  // 1. Spain vs England (UEFA Nations League - League A, Group 3)
   {
     id: 'fix-20261114-01',
     competition: COMPETITIONS[1], // UNL
-    homeTeam: TEAMS.kosovo,
-    awayTeam: TEAMS.israel,
-    kickoffTimeUtc: '2026-11-15T14:00:00Z',
+    homeTeam: TEAMS.spain,
+    awayTeam: TEAMS.england,
+    kickoffTimeUtc: '2026-11-15T19:45:00Z',
     status: 'NS',
     scores: { currentHome: 0, currentAway: 0 },
-    venue: 'Fadil Vokrri Stadium, Pristina',
+    venue: 'Estadio Santiago Bernabéu, Madrid',
     lastUpdatedUtc: '2026-11-15T06:00:00Z',
     dataQuality: 'VALID',
   },
 
-  // 2. Sheffield Wednesday vs Plymouth Argyle (EFL League One)
+  // 2. Belgium vs Italy (UEFA Nations League - League A, Group 1)
   {
     id: 'fix-20261114-02',
-    competition: COMPETITIONS[2], // EFL L1
-    homeTeam: TEAMS.sheffWed,
-    awayTeam: TEAMS.plymouth,
-    kickoffTimeUtc: '2026-11-15T15:00:00Z',
+    competition: COMPETITIONS[1], // UNL
+    homeTeam: TEAMS.belgium,
+    awayTeam: TEAMS.italy,
+    kickoffTimeUtc: '2026-11-15T19:45:00Z',
     status: 'NS',
     scores: { currentHome: 0, currentAway: 0 },
-    venue: 'Hillsborough Stadium, Sheffield',
+    venue: 'King Baudouin Stadium, Brussels',
     lastUpdatedUtc: '2026-11-15T06:00:00Z',
     dataQuality: 'VALID',
   },
 
-  // 3. Uganda vs Botswana (AFCON 2027 Qualifiers)
+  // 3. France vs Türkiye (UEFA Nations League - League A, Group 1)
   {
     id: 'fix-20261114-03',
-    competition: COMPETITIONS[0], // AFCON Qualifiers
-    homeTeam: TEAMS.uganda,
-    awayTeam: TEAMS.botswana,
-    kickoffTimeUtc: '2026-11-15T16:00:00Z',
+    competition: COMPETITIONS[1], // UNL
+    homeTeam: TEAMS.france,
+    awayTeam: TEAMS.turkiye,
+    kickoffTimeUtc: '2026-11-15T19:45:00Z',
     status: 'NS',
     scores: { currentHome: 0, currentAway: 0 },
-    venue: 'Hoima City Stadium, Hoima (Uganda)',
+    venue: 'Stade de France, Saint-Denis',
     lastUpdatedUtc: '2026-11-15T06:00:00Z',
     dataQuality: 'VALID',
   },
 
-  // 4. Norway vs Wales (UEFA Nations League)
+  // 4. Croatia vs Czechia (UEFA Nations League - League A, Group 3)
   {
     id: 'fix-20261114-04',
     competition: COMPETITIONS[1], // UNL
-    homeTeam: TEAMS.norway,
-    awayTeam: TEAMS.wales,
-    kickoffTimeUtc: '2026-11-15T17:00:00Z',
+    homeTeam: TEAMS.croatia,
+    awayTeam: TEAMS.czechia,
+    kickoffTimeUtc: '2026-11-15T19:45:00Z',
     status: 'NS',
     scores: { currentHome: 0, currentAway: 0 },
-    venue: 'Ullevaal Stadion, Oslo',
+    venue: 'Stadion Maksimir, Zagreb',
     lastUpdatedUtc: '2026-11-15T06:00:00Z',
     dataQuality: 'VALID',
   },
 
-  // 5. Georgia vs Hungary (UEFA Nations League)
+  // 5. Finland vs San Marino (UEFA Nations League - League C, Group 1)
   {
     id: 'fix-20261114-05',
     competition: COMPETITIONS[1], // UNL
-    homeTeam: TEAMS.georgia,
-    awayTeam: TEAMS.hungary,
+    homeTeam: TEAMS.finland,
+    awayTeam: TEAMS.sanMarino,
     kickoffTimeUtc: '2026-11-15T17:00:00Z',
     status: 'NS',
     scores: { currentHome: 0, currentAway: 0 },
-    venue: 'Boris Paichadze Dinamo Arena, Tbilisi',
+    venue: 'Helsinki Olympic Stadium, Helsinki',
     lastUpdatedUtc: '2026-11-15T06:00:00Z',
     dataQuality: 'VALID',
   },
 
-  // 6. Portugal vs Denmark (UEFA Nations League)
+  // 6. Portugal vs Poland (UEFA Nations League - League A, Group 1)
   {
     id: 'fix-20261114-06',
     competition: COMPETITIONS[1], // UNL
     homeTeam: TEAMS.portugal,
-    awayTeam: TEAMS.denmark,
-    kickoffTimeUtc: '2026-11-15T19:45:00Z',
-    status: 'NS',
-    scores: { currentHome: 0, currentAway: 0 },
-    venue: 'Estádio Municipal de Braga, Braga',
-    referee: 'Rade Obrenovič (Slovenia)',
-    lastUpdatedUtc: '2026-11-15T06:00:00Z',
-    dataQuality: 'VALID',
-  },
-
-  // 7. Austria vs Republic of Ireland (UEFA Nations League)
-  {
-    id: 'fix-20261114-07',
-    competition: COMPETITIONS[1], // UNL
-    homeTeam: TEAMS.austria,
-    awayTeam: TEAMS.ireland,
-    kickoffTimeUtc: '2026-11-15T19:45:00Z',
-    status: 'NS',
-    scores: { currentHome: 0, currentAway: 0 },
-    venue: 'Ernst-Happel-Stadion, Vienna',
-    lastUpdatedUtc: '2026-11-15T06:00:00Z',
-    dataQuality: 'VALID',
-  },
-
-  // 8. Northern Ireland vs Ukraine (UEFA Nations League)
-  {
-    id: 'fix-20261114-08',
-    competition: COMPETITIONS[1], // UNL
-    homeTeam: TEAMS.northernIreland,
-    awayTeam: TEAMS.ukraine,
-    kickoffTimeUtc: '2026-11-15T19:45:00Z',
-    status: 'NS',
-    scores: { currentHome: 0, currentAway: 0 },
-    venue: 'Windsor Park, Belfast',
-    lastUpdatedUtc: '2026-11-15T06:00:00Z',
-    dataQuality: 'VALID',
-  },
-
-  // 9. Romania vs Poland (UEFA Nations League)
-  {
-    id: 'fix-20261114-09',
-    competition: COMPETITIONS[1], // UNL
-    homeTeam: TEAMS.romania,
     awayTeam: TEAMS.poland,
     kickoffTimeUtc: '2026-11-15T19:45:00Z',
     status: 'NS',
     scores: { currentHome: 0, currentAway: 0 },
-    venue: 'Arena Națională, Bucharest',
+    venue: 'Estádio do Dragão, Porto',
+    referee: 'Clément Turpin (France)',
     lastUpdatedUtc: '2026-11-15T06:00:00Z',
     dataQuality: 'VALID',
   },
 
-  // 10. Sweden vs Bosnia and Herzegovina (UEFA Nations League)
+  // 7. Belarus vs Albania (UEFA Nations League - League C, Group 1)
+  {
+    id: 'fix-20261114-07',
+    competition: COMPETITIONS[1], // UNL
+    homeTeam: TEAMS.belarus,
+    awayTeam: TEAMS.albania,
+    kickoffTimeUtc: '2026-11-15T17:00:00Z',
+    status: 'NS',
+    scores: { currentHome: 0, currentAway: 0 },
+    venue: 'ZTE Arena, Zalaegerszeg',
+    lastUpdatedUtc: '2026-11-15T06:00:00Z',
+    dataQuality: 'VALID',
+  },
+
+  // 8. Cyprus vs Montenegro (UEFA Nations League - League C, Group 2)
+  {
+    id: 'fix-20261114-08',
+    competition: COMPETITIONS[1], // UNL
+    homeTeam: TEAMS.cyprus,
+    awayTeam: TEAMS.montenegro,
+    kickoffTimeUtc: '2026-11-15T17:00:00Z',
+    status: 'NS',
+    scores: { currentHome: 0, currentAway: 0 },
+    venue: 'AEK Arena, Larnaca',
+    lastUpdatedUtc: '2026-11-15T06:00:00Z',
+    dataQuality: 'VALID',
+  },
+
+  // 9. Latvia vs Armenia (UEFA Nations League - League C, Group 2)
+  {
+    id: 'fix-20261114-09',
+    competition: COMPETITIONS[1], // UNL
+    homeTeam: TEAMS.latvia,
+    awayTeam: TEAMS.armenia,
+    kickoffTimeUtc: '2026-11-15T14:00:00Z',
+    status: 'NS',
+    scores: { currentHome: 0, currentAway: 0 },
+    venue: 'Skonto Stadium, Riga',
+    lastUpdatedUtc: '2026-11-15T06:00:00Z',
+    dataQuality: 'VALID',
+  },
+
+  // 10. Denmark vs Switzerland (UEFA Nations League - League A, Group 4)
   {
     id: 'fix-20261114-10',
     competition: COMPETITIONS[1], // UNL
-    homeTeam: TEAMS.sweden,
-    awayTeam: TEAMS.bosnia,
+    homeTeam: TEAMS.denmark,
+    awayTeam: TEAMS.switzerland,
     kickoffTimeUtc: '2026-11-15T19:45:00Z',
     status: 'NS',
     scores: { currentHome: 0, currentAway: 0 },
-    venue: 'Strawberry Arena, Solna',
+    venue: 'Parken Stadium, Copenhagen',
     lastUpdatedUtc: '2026-11-15T06:00:00Z',
     dataQuality: 'VALID',
   },
