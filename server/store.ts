@@ -12,6 +12,15 @@ export interface ServerMatchScores {
   minute?: number;
 }
 
+export interface ServerSettlementRecord {
+  status: 'WON' | 'LOST' | 'VOID' | 'PENDING';
+  settledAt: string;
+  actualScore: string;
+  htScore?: string;
+  markets: Record<string, 'WON' | 'LOST' | 'VOID'>;
+  source: string;
+}
+
 export interface ServerFixtureUpdate {
   fixtureId: string;
   homeTeamName: string;
@@ -22,6 +31,7 @@ export interface ServerFixtureUpdate {
   scores: ServerMatchScores;
   lastUpdatedUtc: string;
   syncSource: string;
+  settlement?: ServerSettlementRecord;
 }
 
 export interface TrackedFixtureMeta {
