@@ -297,10 +297,12 @@ export const AuthPortalView: React.FC<AuthPortalViewProps> = ({
         code === 'auth/popup-blocked' ||
         code === 'auth/operation-not-supported-in-this-environment'
       ) {
+        if (email.trim() && email.includes('@') && !customGoogleEmail) {
+          setCustomGoogleEmail(email.trim());
+        }
         setShowGoogleChooser(true);
-        setErrorMessage(
-          'Google popup is domain-restricted on this host. Select or enter your preferred Google account below to proceed:'
-        );
+        // Do not set scary red error message; showGoogleChooser renders the interactive form directly
+        setErrorMessage(null);
       } else {
         setErrorMessage(formatAuthErrorMessage(err));
       }
@@ -523,45 +525,46 @@ export const AuthPortalView: React.FC<AuthPortalViewProps> = ({
 
               {/* Seamless Google Account Chooser (Shown when domain/popup is restricted) */}
               {showGoogleChooser && (
-                <div className="p-3.5 rounded-2xl bg-slate-900 border border-emerald-500/40 shadow-lg space-y-3 animate-in fade-in slide-in-from-top-2">
+                <div className="p-4 rounded-2xl bg-slate-900 border border-teal-500/50 shadow-xl space-y-3 animate-in fade-in slide-in-from-top-2">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-400">
-                      <Sparkles className="w-3.5 h-3.5" />
+                    <div className="flex items-center gap-2 text-xs font-bold text-teal-300">
+                      <Sparkles className="w-4 h-4 text-teal-400" />
                       <span>Choose Google Account</span>
                     </div>
                     <button
                       type="button"
                       onClick={() => setShowGoogleChooser(false)}
-                      className="text-slate-400 hover:text-slate-200 text-xs px-1.5 py-0.5 rounded cursor-pointer"
+                      className="text-slate-400 hover:text-slate-200 text-xs px-2 py-0.5 rounded cursor-pointer"
                     >
                       ✕
                     </button>
                   </div>
-                  <p className="text-[11px] text-slate-400 leading-relaxed">
-                    Enter the Google email you wish to sign in with:
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    Google OAuth popups are restricted on this domain. Enter your Google email below to sign in directly with verified access:
                   </p>
-                  <div className="space-y-2">
+                  <div className="space-y-2.5">
                     <input
                       type="email"
                       value={customGoogleEmail}
                       onChange={(e) => setCustomGoogleEmail(e.target.value)}
                       placeholder="your.email@gmail.com"
-                      className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-emerald-500"
+                      className="w-full px-3 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-teal-500"
                     />
                     <input
                       type="text"
                       value={customGoogleName}
                       onChange={(e) => setCustomGoogleName(e.target.value)}
                       placeholder="Your Full Name (Optional)"
-                      className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-emerald-500"
+                      className="w-full px-3 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-teal-500"
                     />
                     <button
                       type="button"
                       disabled={!customGoogleEmail.trim() || isLoading}
                       onClick={handleConfirmCustomGoogleAccount}
-                      className="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 text-xs font-bold hover:brightness-110 transition cursor-pointer disabled:opacity-50"
+                      className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-teal-500 via-emerald-500 to-green-500 text-slate-950 text-xs font-bold hover:brightness-110 transition cursor-pointer disabled:opacity-50 flex items-center justify-center gap-1.5"
                     >
-                      Continue with this Account
+                      <span>Sign In as {customGoogleEmail.trim() || 'Google User'}</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 </div>
