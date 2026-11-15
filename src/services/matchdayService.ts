@@ -99,7 +99,7 @@ const DAILY_PAIRING_TEMPLATES: MatchPairingTemplate[] = [
   // African Leagues
   { competitionId: 'psl', homeTeamKey: 'mamelodiSundowns', awayTeamKey: 'orlandoPirates', localHour: 16, localMinute: 0, venue: 'Loftus Versfeld, Pretoria' },
   { competitionId: 'egy', homeTeamKey: 'alAhly', awayTeamKey: 'zamalek', localHour: 20, localMinute: 0, venue: 'Cairo International Stadium, Cairo' },
-  { competitionId: 'egy', homeTeamKey: 'alAhly', awayTeamKey: 'zamalek', localHour: 20, localMinute: 0, venue: 'Cairo International Stadium, Cairo' },
+  { competitionId: 'egy', homeTeamKey: 'pyramidsFc', awayTeamKey: 'modernFuture', localHour: 17, localMinute: 30, venue: '30 June Stadium, Cairo' },
 ];
 
 /**
