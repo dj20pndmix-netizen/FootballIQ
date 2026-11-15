@@ -4,6 +4,16 @@ import {
   serverStore,
   saveServerStore,
 } from './store.ts';
+import { getInitialFixtures } from '../src/services/mockHistoricalData.ts';
+
+const baselineMap = new Map<string, any>();
+try {
+  for (const fix of getInitialFixtures()) {
+    baselineMap.set(fix.id, fix.prediction);
+  }
+} catch {
+  // Graceful fallback during tests
+}
 
 export interface ServerSettlementSummary {
   settledCount: number;
@@ -99,23 +109,30 @@ export function runServerAutoSettlement(): ServerSettlementSummary {
         continue;
       }
 
-      // Grade the 5 primary markets
+      // Grade the 5 primary markets using actual pre-match predictions
       const actual1X2 = h > a ? '1' : h === a ? 'X' : '2';
       const actualBTTS = h > 0 && a > 0 ? 'YES' : 'NO';
       const actualOU25 = h + a >= 3 ? 'OVER' : 'UNDER';
       const actualDC = actual1X2 === '1' ? ['1X', '12'] : actual1X2 === 'X' ? ['1X', 'X2'] : ['X2', '12'];
 
-      // Derive predicted winner heuristic if pre-match pick not attached to raw server update
-      // By default home win if home rating higher, else verified via client fixture prediction
-      const defaultPredicted1X2 = '1';
-      const won1X2 = defaultPredicted1X2 === actual1X2;
+      const pred = baselineMap.get(fixtureId);
+      const predicted1X2 = pred?.market1X2?.predictedOutcome || '1';
+      const predictedBTTS = pred?.marketBTTS?.predictedOutcome || 'NO';
+      const predictedOU25 = pred?.marketOverUnder25?.predictedOutcome || 'UNDER';
+      const predictedDC = pred?.marketDoubleChance?.predictedOutcome || '1X';
+      const predictedHtFt = pred?.marketHtFt?.predictedOutcome;
+
+      const won1X2 = actual1X2 === predicted1X2;
+      const wonBTTS = actualBTTS === predictedBTTS;
+      const wonOU25 = actualOU25 === predictedOU25;
+      const wonDC = actualDC.includes(predictedDC);
 
       let htFtResult: 'WON' | 'LOST' | 'VOID' = 'VOID';
-      if (htH !== null && htA !== null) {
+      if (htH !== null && htA !== null && predictedHtFt) {
         const htState = htH > htA ? 'H' : htH === htA ? 'D' : 'A';
         const ftState = h > a ? 'H' : h === a ? 'D' : 'A';
         const actualHtFt = `${htState}${ftState}`;
-        htFtResult = actualHtFt === 'HH' ? 'WON' : 'LOST';
+        htFtResult = actualHtFt === predictedHtFt ? 'WON' : 'LOST';
       }
 
       const settlementRecord: ServerSettlementRecord = {
@@ -125,9 +142,9 @@ export function runServerAutoSettlement(): ServerSettlementSummary {
         htScore: htScoreStr,
         markets: {
           market1X2: won1X2 ? 'WON' : 'LOST',
-          marketBTTS: actualBTTS === 'YES' ? 'WON' : 'LOST',
-          marketOverUnder25: actualOU25 === 'OVER' ? 'WON' : 'LOST',
-          marketDoubleChance: actualDC.includes('1X') ? 'WON' : 'LOST',
+          marketBTTS: wonBTTS ? 'WON' : 'LOST',
+          marketOverUnder25: wonOU25 ? 'WON' : 'LOST',
+          marketDoubleChance: wonDC ? 'WON' : 'LOST',
           marketHtFt: htFtResult,
         },
         source: update.syncSource || 'Server-Auto-Settlement',
