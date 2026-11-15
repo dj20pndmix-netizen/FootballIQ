@@ -42,6 +42,8 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
   const [testResult, setTestResult] = useState<{ ok: boolean; message: string; latencyMs: number } | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
   const [lastSyncResult, setLastSyncResult] = useState<SyncResult | null>(null);
+  const [isReconcilingSettlement, setIsReconcilingSettlement] = useState(false);
+  const [settlementReconciliationResult, setSettlementReconciliationResult] = useState<any | null>(null);
 
   // Check admin rights
   if (!user || user.email !== ADMIN_EMAIL) {
@@ -84,6 +86,33 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
     } finally {
       setIsSyncing(false);
     }
+  };
+
+  const handleReconcileSettlement = async () => {
+    try {
+      setIsReconcilingSettlement(true);
+      const resp = await fetch('/api/settlement/reconcile', { method: 'POST' });
+      const data = await resp.json();
+      if (data.success) {
+        setSettlementReconciliationResult(data.data.summary);
+        await onTriggerSync();
+      } else {
+        setSettlementReconciliationResult({ error: data.error || 'Reconciliation failed' });
+      }
+    } catch (err: any) {
+      setSettlementReconciliationResult({ error: err.message });
+    } finally {
+      setIsReconcilingSettlement(false);
+    }
+  };
+
+  const settlementStats = {
+    total: fixtures.length,
+    completed: fixtures.filter((f) => f.status === 'FT').length,
+    settled: fixtures.filter((f) => f.status === 'FT' && f.prediction?.settlement).length,
+    awaiting: fixtures.filter((f) => f.status === 'FT' && !f.prediction?.settlement).length,
+    pending: fixtures.filter((f) => f.status === 'NS' || f.status === 'LIVE' || f.status === 'HT').length,
+    voided: fixtures.filter((f) => f.status === 'POSTP' || f.status === 'CANC').length,
   };
 
   const dataQualityStats = {
