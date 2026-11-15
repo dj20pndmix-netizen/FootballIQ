@@ -11,7 +11,7 @@
         "currentHome": 0,
         "currentAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.517Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.635Z",
       "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-20261114-02": {
@@ -25,7 +25,7 @@
         "currentHome": 0,
         "currentAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.517Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-20261114-03": {
@@ -39,7 +39,7 @@
         "currentHome": 0,
         "currentAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.517Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-20261114-04": {
@@ -53,7 +53,7 @@
         "currentHome": 0,
         "currentAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.517Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-20261114-05": {
@@ -67,7 +67,7 @@
         "currentHome": 0,
         "currentAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.517Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-20261114-06": {
@@ -81,7 +81,7 @@
         "currentHome": 0,
         "currentAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.517Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-20261114-07": {
@@ -95,7 +95,7 @@
         "currentHome": 0,
         "currentAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.517Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-20261114-08": {
@@ -109,7 +109,7 @@
         "currentHome": 0,
         "currentAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.517Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-20261114-09": {
@@ -123,7 +123,7 @@
         "currentHome": 0,
         "currentAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.517Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-20261114-10": {
@@ -137,7 +137,7 @@
         "currentHome": 0,
         "currentAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.517Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-20261113-01": {
@@ -153,7 +153,7 @@
         "htHome": 4,
         "htAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.517Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation",
       "settlement": {
         "status": "WON",
@@ -183,7 +183,7 @@
         "htHome": 0,
         "htAway": 2
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.517Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation",
       "settlement": {
         "status": "LOST",
@@ -206,30 +206,13 @@
       "awayTeamName": "Chelsea",
       "competitionId": "pl",
       "kickoffTimeUtc": "2026-11-15T12:30:00Z",
-      "status": "FT",
+      "status": "LIVE",
       "scores": {
         "currentHome": 2,
-        "currentAway": 1,
-        "htHome": 1,
-        "htAway": 1,
-        "minute": 68
+        "currentAway": 1
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.517Z",
-      "syncSource": "Persisted-Matchday",
-      "settlement": {
-        "status": "WON",
-        "settledAt": "2026-11-15T07:28:11.230Z",
-        "actualScore": "2 - 1",
-        "htScore": "1 - 1",
-        "markets": {
-          "market1X2": "WON",
-          "marketBTTS": "WON",
-          "marketOverUnder25": "WON",
-          "marketDoubleChance": "WON",
-          "marketHtFt": "LOST"
-        },
-        "source": "Persisted-Matchday"
-      }
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
+      "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-pl-02": {
       "fixtureId": "fix-pl-02",
@@ -242,7 +225,7 @@
         "currentHome": 0,
         "currentAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.517Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-pl-03": {
@@ -258,7 +241,7 @@
         "htHome": 1,
         "htAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.517Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation",
       "settlement": {
         "status": "WON",
@@ -286,7 +269,7 @@
         "currentHome": 0,
         "currentAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.517Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-ll-01": {
@@ -300,7 +283,7 @@
         "currentHome": 0,
         "currentAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.517Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-ll-02": {
@@ -309,30 +292,13 @@
       "awayTeamName": "Sevilla",
       "competitionId": "ll",
       "kickoffTimeUtc": "2026-11-15T15:15:00Z",
-      "status": "FT",
+      "status": "LIVE",
       "scores": {
         "currentHome": 1,
-        "currentAway": 0,
-        "htHome": 1,
-        "htAway": 0,
-        "minute": 42
+        "currentAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.517Z",
-      "syncSource": "Persisted-Matchday",
-      "settlement": {
-        "status": "WON",
-        "settledAt": "2026-11-15T07:28:11.230Z",
-        "actualScore": "1 - 0",
-        "htScore": "1 - 0",
-        "markets": {
-          "market1X2": "WON",
-          "marketBTTS": "LOST",
-          "marketOverUnder25": "LOST",
-          "marketDoubleChance": "WON",
-          "marketHtFt": "WON"
-        },
-        "source": "Persisted-Matchday"
-      }
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
+      "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-ll-03": {
       "fixtureId": "fix-ll-03",
@@ -347,7 +313,7 @@
         "htHome": 0,
         "htAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.517Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation",
       "settlement": {
         "status": "LOST",
@@ -375,7 +341,7 @@
         "currentHome": 0,
         "currentAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.517Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-sa-02": {
@@ -384,30 +350,13 @@
       "awayTeamName": "Napoli",
       "competitionId": "sa",
       "kickoffTimeUtc": "2026-11-15T17:00:00Z",
-      "status": "FT",
+      "status": "LIVE",
       "scores": {
         "currentHome": 2,
-        "currentAway": 2,
-        "htHome": 1,
-        "htAway": 1,
-        "minute": 75
+        "currentAway": 2
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
-      "syncSource": "Persisted-Matchday",
-      "settlement": {
-        "status": "LOST",
-        "settledAt": "2026-11-15T07:28:11.230Z",
-        "actualScore": "2 - 2",
-        "htScore": "1 - 1",
-        "markets": {
-          "market1X2": "LOST",
-          "marketBTTS": "WON",
-          "marketOverUnder25": "WON",
-          "marketDoubleChance": "WON",
-          "marketHtFt": "LOST"
-        },
-        "source": "Persisted-Matchday"
-      }
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
+      "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-sa-03": {
       "fixtureId": "fix-sa-03",
@@ -422,7 +371,7 @@
         "htHome": 1,
         "htAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation",
       "settlement": {
         "status": "WON",
@@ -450,7 +399,7 @@
         "currentHome": 0,
         "currentAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-bl-02": {
@@ -459,30 +408,13 @@
       "awayTeamName": "RB Leipzig",
       "competitionId": "bl",
       "kickoffTimeUtc": "2026-11-15T14:30:00Z",
-      "status": "FT",
+      "status": "LIVE",
       "scores": {
         "currentHome": 3,
-        "currentAway": 2,
-        "htHome": 2,
-        "htAway": 1,
-        "minute": 53
+        "currentAway": 2
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
-      "syncSource": "Persisted-Matchday",
-      "settlement": {
-        "status": "WON",
-        "settledAt": "2026-11-15T07:28:11.230Z",
-        "actualScore": "3 - 2",
-        "htScore": "2 - 1",
-        "markets": {
-          "market1X2": "WON",
-          "marketBTTS": "WON",
-          "marketOverUnder25": "WON",
-          "marketDoubleChance": "WON",
-          "marketHtFt": "WON"
-        },
-        "source": "Persisted-Matchday"
-      }
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
+      "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-bl-03": {
       "fixtureId": "fix-bl-03",
@@ -497,7 +429,7 @@
         "htHome": 1,
         "htAway": 1
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation",
       "settlement": {
         "status": "WON",
@@ -525,7 +457,7 @@
         "currentHome": 0,
         "currentAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-l1-02": {
@@ -534,30 +466,13 @@
       "awayTeamName": "Lyon",
       "competitionId": "l1",
       "kickoffTimeUtc": "2026-11-15T16:00:00Z",
-      "status": "FT",
+      "status": "LIVE",
       "scores": {
         "currentHome": 1,
-        "currentAway": 0,
-        "htHome": 0,
-        "htAway": 0,
-        "minute": 31
+        "currentAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
-      "syncSource": "Persisted-Matchday",
-      "settlement": {
-        "status": "WON",
-        "settledAt": "2026-11-15T07:28:11.230Z",
-        "actualScore": "1 - 0",
-        "htScore": "0 - 0",
-        "markets": {
-          "market1X2": "WON",
-          "marketBTTS": "LOST",
-          "marketOverUnder25": "LOST",
-          "marketDoubleChance": "WON",
-          "marketHtFt": "LOST"
-        },
-        "source": "Persisted-Matchday"
-      }
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
+      "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-l1-03": {
       "fixtureId": "fix-l1-03",
@@ -572,7 +487,7 @@
         "htHome": 0,
         "htAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation",
       "settlement": {
         "status": "WON",
@@ -600,7 +515,7 @@
         "currentHome": 0,
         "currentAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-ucl-02": {
@@ -609,30 +524,13 @@
       "awayTeamName": "Paris Saint-Germain",
       "competitionId": "ucl",
       "kickoffTimeUtc": "2026-11-15T18:00:00Z",
-      "status": "FT",
+      "status": "LIVE",
       "scores": {
         "currentHome": 1,
-        "currentAway": 0,
-        "htHome": 1,
-        "htAway": 0,
-        "minute": 84
+        "currentAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
-      "syncSource": "Persisted-Matchday",
-      "settlement": {
-        "status": "WON",
-        "settledAt": "2026-11-15T07:28:11.230Z",
-        "actualScore": "1 - 0",
-        "htScore": "1 - 0",
-        "markets": {
-          "market1X2": "WON",
-          "marketBTTS": "LOST",
-          "marketOverUnder25": "LOST",
-          "marketDoubleChance": "WON",
-          "marketHtFt": "WON"
-        },
-        "source": "Persisted-Matchday"
-      }
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
+      "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-uel-01": {
       "fixtureId": "fix-uel-01",
@@ -645,7 +543,7 @@
         "currentHome": 0,
         "currentAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-uel-02": {
@@ -661,7 +559,7 @@
         "htHome": 2,
         "htAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation",
       "settlement": {
         "status": "WON",
@@ -689,7 +587,7 @@
         "currentHome": 0,
         "currentAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-uecl-02": {
@@ -705,7 +603,7 @@
         "htHome": 1,
         "htAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation",
       "settlement": {
         "status": "WON",
@@ -733,7 +631,7 @@
         "currentHome": 0,
         "currentAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-unl-extra-02": {
@@ -742,30 +640,13 @@
       "awayTeamName": "Switzerland",
       "competitionId": "unl",
       "kickoffTimeUtc": "2026-11-15T18:00:00Z",
-      "status": "FT",
+      "status": "LIVE",
       "scores": {
         "currentHome": 2,
-        "currentAway": 0,
-        "htHome": 1,
-        "htAway": 0,
-        "minute": 58
+        "currentAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
-      "syncSource": "Persisted-Matchday",
-      "settlement": {
-        "status": "WON",
-        "settledAt": "2026-11-15T07:28:11.230Z",
-        "actualScore": "2 - 0",
-        "htScore": "1 - 0",
-        "markets": {
-          "market1X2": "WON",
-          "marketBTTS": "LOST",
-          "marketOverUnder25": "LOST",
-          "marketDoubleChance": "WON",
-          "marketHtFt": "WON"
-        },
-        "source": "Persisted-Matchday"
-      }
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
+      "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-unl-extra-03": {
       "fixtureId": "fix-unl-extra-03",
@@ -780,7 +661,7 @@
         "htHome": 1,
         "htAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation",
       "settlement": {
         "status": "WON",
@@ -808,7 +689,7 @@
         "currentHome": 0,
         "currentAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-afcon-03": {
@@ -817,30 +698,13 @@
       "awayTeamName": "Senegal",
       "competitionId": "afcon-q",
       "kickoffTimeUtc": "2026-11-15T16:00:00Z",
-      "status": "FT",
+      "status": "LIVE",
       "scores": {
         "currentHome": 1,
-        "currentAway": 1,
-        "htHome": 1,
-        "htAway": 0,
-        "minute": 62
+        "currentAway": 1
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
-      "syncSource": "Persisted-Matchday",
-      "settlement": {
-        "status": "LOST",
-        "settledAt": "2026-11-15T07:28:11.230Z",
-        "actualScore": "1 - 1",
-        "htScore": "1 - 0",
-        "markets": {
-          "market1X2": "LOST",
-          "marketBTTS": "WON",
-          "marketOverUnder25": "LOST",
-          "marketDoubleChance": "WON",
-          "marketHtFt": "LOST"
-        },
-        "source": "Persisted-Matchday"
-      }
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
+      "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-afcon-04": {
       "fixtureId": "fix-afcon-04",
@@ -855,7 +719,7 @@
         "htHome": 1,
         "htAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation",
       "settlement": {
         "status": "WON",
@@ -883,7 +747,7 @@
         "currentHome": 0,
         "currentAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-caf-cl-01": {
@@ -897,7 +761,7 @@
         "currentHome": 0,
         "currentAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-caf-cl-02": {
@@ -913,7 +777,7 @@
         "htHome": 1,
         "htAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation",
       "settlement": {
         "status": "WON",
@@ -941,7 +805,7 @@
         "currentHome": 0,
         "currentAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-wcq-sa-02": {
@@ -950,30 +814,13 @@
       "awayTeamName": "Colombia",
       "competitionId": "wcq-sa",
       "kickoffTimeUtc": "2026-11-15T17:00:00Z",
-      "status": "FT",
+      "status": "LIVE",
       "scores": {
         "currentHome": 2,
-        "currentAway": 1,
-        "htHome": 1,
-        "htAway": 1,
-        "minute": 71
+        "currentAway": 1
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
-      "syncSource": "Persisted-Matchday",
-      "settlement": {
-        "status": "WON",
-        "settledAt": "2026-11-15T07:28:11.230Z",
-        "actualScore": "2 - 1",
-        "htScore": "1 - 1",
-        "markets": {
-          "market1X2": "WON",
-          "marketBTTS": "WON",
-          "marketOverUnder25": "WON",
-          "marketDoubleChance": "WON",
-          "marketHtFt": "LOST"
-        },
-        "source": "Persisted-Matchday"
-      }
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
+      "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-wcq-sa-03": {
       "fixtureId": "fix-wcq-sa-03",
@@ -988,7 +835,7 @@
         "htHome": 1,
         "htAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation",
       "settlement": {
         "status": "WON",
@@ -1016,7 +863,7 @@
         "currentHome": 0,
         "currentAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-lib-02": {
@@ -1032,7 +879,7 @@
         "htHome": 0,
         "htAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation",
       "settlement": {
         "status": "WON",
@@ -1060,7 +907,7 @@
         "currentHome": 0,
         "currentAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-bra-02": {
@@ -1069,30 +916,13 @@
       "awayTeamName": "Grêmio",
       "competitionId": "bra",
       "kickoffTimeUtc": "2026-11-15T16:00:00Z",
-      "status": "FT",
+      "status": "LIVE",
       "scores": {
         "currentHome": 1,
-        "currentAway": 0,
-        "htHome": 0,
-        "htAway": 0,
-        "minute": 35
+        "currentAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
-      "syncSource": "Persisted-Matchday",
-      "settlement": {
-        "status": "WON",
-        "settledAt": "2026-11-15T07:28:11.230Z",
-        "actualScore": "1 - 0",
-        "htScore": "0 - 0",
-        "markets": {
-          "market1X2": "WON",
-          "marketBTTS": "LOST",
-          "marketOverUnder25": "LOST",
-          "marketDoubleChance": "WON",
-          "marketHtFt": "LOST"
-        },
-        "source": "Persisted-Matchday"
-      }
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
+      "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-arg-01": {
       "fixtureId": "fix-arg-01",
@@ -1105,7 +935,7 @@
         "currentHome": 0,
         "currentAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-arg-02": {
@@ -1121,7 +951,7 @@
         "htHome": 1,
         "htAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation",
       "settlement": {
         "status": "WON",
@@ -1149,7 +979,7 @@
         "currentHome": 0,
         "currentAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-mls-02": {
@@ -1158,30 +988,13 @@
       "awayTeamName": "Seattle Sounders",
       "competitionId": "mls",
       "kickoffTimeUtc": "2026-11-15T18:00:00Z",
-      "status": "FT",
+      "status": "LIVE",
       "scores": {
         "currentHome": 2,
-        "currentAway": 2,
-        "htHome": 1,
-        "htAway": 1,
-        "minute": 79
+        "currentAway": 2
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
-      "syncSource": "Persisted-Matchday",
-      "settlement": {
-        "status": "LOST",
-        "settledAt": "2026-11-15T07:28:11.230Z",
-        "actualScore": "2 - 2",
-        "htScore": "1 - 1",
-        "markets": {
-          "market1X2": "LOST",
-          "marketBTTS": "WON",
-          "marketOverUnder25": "WON",
-          "marketDoubleChance": "WON",
-          "marketHtFt": "LOST"
-        },
-        "source": "Persisted-Matchday"
-      }
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
+      "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-mls-03": {
       "fixtureId": "fix-mls-03",
@@ -1196,7 +1009,7 @@
         "htHome": 2,
         "htAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation",
       "settlement": {
         "status": "WON",
@@ -1224,7 +1037,7 @@
         "currentHome": 0,
         "currentAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-lmx-02": {
@@ -1233,30 +1046,13 @@
       "awayTeamName": "Pumas UNAM",
       "competitionId": "lmx",
       "kickoffTimeUtc": "2026-11-15T17:00:00Z",
-      "status": "FT",
+      "status": "LIVE",
       "scores": {
         "currentHome": 2,
-        "currentAway": 1,
-        "htHome": 2,
-        "htAway": 1,
-        "minute": 44
+        "currentAway": 1
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
-      "syncSource": "Persisted-Matchday",
-      "settlement": {
-        "status": "WON",
-        "settledAt": "2026-11-15T07:28:11.230Z",
-        "actualScore": "2 - 1",
-        "htScore": "2 - 1",
-        "markets": {
-          "market1X2": "WON",
-          "marketBTTS": "WON",
-          "marketOverUnder25": "WON",
-          "marketDoubleChance": "WON",
-          "marketHtFt": "WON"
-        },
-        "source": "Persisted-Matchday"
-      }
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
+      "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-lmx-03": {
       "fixtureId": "fix-lmx-03",
@@ -1271,7 +1067,7 @@
         "htHome": 1,
         "htAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation",
       "settlement": {
         "status": "LOST",
@@ -1299,7 +1095,7 @@
         "currentHome": 0,
         "currentAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-spl-02": {
@@ -1308,30 +1104,13 @@
       "awayTeamName": "Al Ahli",
       "competitionId": "spl",
       "kickoffTimeUtc": "2026-11-15T15:30:00Z",
-      "status": "FT",
+      "status": "LIVE",
       "scores": {
         "currentHome": 1,
-        "currentAway": 2,
-        "htHome": 1,
-        "htAway": 1,
-        "minute": 50
+        "currentAway": 2
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
-      "syncSource": "Persisted-Matchday",
-      "settlement": {
-        "status": "LOST",
-        "settledAt": "2026-11-15T07:28:11.230Z",
-        "actualScore": "1 - 2",
-        "htScore": "1 - 1",
-        "markets": {
-          "market1X2": "LOST",
-          "marketBTTS": "WON",
-          "marketOverUnder25": "WON",
-          "marketDoubleChance": "LOST",
-          "marketHtFt": "LOST"
-        },
-        "source": "Persisted-Matchday"
-      }
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
+      "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-spl-03": {
       "fixtureId": "fix-spl-03",
@@ -1346,7 +1125,7 @@
         "htHome": 0,
         "htAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation",
       "settlement": {
         "status": "WON",
@@ -1374,7 +1153,7 @@
         "currentHome": 0,
         "currentAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-acl-02": {
@@ -1390,7 +1169,7 @@
         "htHome": 0,
         "htAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation",
       "settlement": {
         "status": "WON",
@@ -1418,7 +1197,7 @@
         "currentHome": 0,
         "currentAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-ered-01": {
@@ -1432,7 +1211,7 @@
         "currentHome": 0,
         "currentAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-ered-02": {
@@ -1441,30 +1220,13 @@
       "awayTeamName": "AZ Alkmaar",
       "competitionId": "ered",
       "kickoffTimeUtc": "2026-11-15T15:45:00Z",
-      "status": "FT",
+      "status": "LIVE",
       "scores": {
         "currentHome": 3,
-        "currentAway": 1,
-        "htHome": 2,
-        "htAway": 0,
-        "minute": 65
+        "currentAway": 1
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
-      "syncSource": "Persisted-Matchday",
-      "settlement": {
-        "status": "WON",
-        "settledAt": "2026-11-15T07:28:11.230Z",
-        "actualScore": "3 - 1",
-        "htScore": "2 - 0",
-        "markets": {
-          "market1X2": "WON",
-          "marketBTTS": "WON",
-          "marketOverUnder25": "WON",
-          "marketDoubleChance": "WON",
-          "marketHtFt": "WON"
-        },
-        "source": "Persisted-Matchday"
-      }
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
+      "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-por-01": {
       "fixtureId": "fix-por-01",
@@ -1477,7 +1239,7 @@
         "currentHome": 0,
         "currentAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-por-02": {
@@ -1493,7 +1255,7 @@
         "htHome": 1,
         "htAway": 1
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation",
       "settlement": {
         "status": "WON",
@@ -1521,7 +1283,7 @@
         "currentHome": 0,
         "currentAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-cha-02": {
@@ -1530,30 +1292,13 @@
       "awayTeamName": "Sheffield United",
       "competitionId": "efl-cha",
       "kickoffTimeUtc": "2026-11-15T15:00:00Z",
-      "status": "FT",
+      "status": "LIVE",
       "scores": {
         "currentHome": 1,
-        "currentAway": 1,
-        "htHome": 0,
-        "htAway": 0,
-        "minute": 56
+        "currentAway": 1
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
-      "syncSource": "Persisted-Matchday",
-      "settlement": {
-        "status": "LOST",
-        "settledAt": "2026-11-15T07:28:11.230Z",
-        "actualScore": "1 - 1",
-        "htScore": "0 - 0",
-        "markets": {
-          "market1X2": "LOST",
-          "marketBTTS": "WON",
-          "marketOverUnder25": "LOST",
-          "marketDoubleChance": "WON",
-          "marketHtFt": "LOST"
-        },
-        "source": "Persisted-Matchday"
-      }
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
+      "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-efl-l1-02": {
       "fixtureId": "fix-efl-l1-02",
@@ -1561,30 +1306,13 @@
       "awayTeamName": "Peterborough United",
       "competitionId": "efl-l1",
       "kickoffTimeUtc": "2026-11-15T15:00:00Z",
-      "status": "FT",
+      "status": "LIVE",
       "scores": {
         "currentHome": 2,
-        "currentAway": 1,
-        "htHome": 1,
-        "htAway": 1,
-        "minute": 70
+        "currentAway": 1
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
-      "syncSource": "Persisted-Matchday",
-      "settlement": {
-        "status": "WON",
-        "settledAt": "2026-11-15T07:28:11.230Z",
-        "actualScore": "2 - 1",
-        "htScore": "1 - 1",
-        "markets": {
-          "market1X2": "WON",
-          "marketBTTS": "WON",
-          "marketOverUnder25": "WON",
-          "marketDoubleChance": "WON",
-          "marketHtFt": "LOST"
-        },
-        "source": "Persisted-Matchday"
-      }
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
+      "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-efl-l1-03": {
       "fixtureId": "fix-efl-l1-03",
@@ -1599,7 +1327,7 @@
         "htHome": 1,
         "htAway": 1
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation",
       "settlement": {
         "status": "LOST",
@@ -1627,7 +1355,7 @@
         "currentHome": 0,
         "currentAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-scot-02": {
@@ -1643,7 +1371,7 @@
         "htHome": 0,
         "htAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation",
       "settlement": {
         "status": "WON",
@@ -1671,7 +1399,7 @@
         "currentHome": 0,
         "currentAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-tsl-02": {
@@ -1680,30 +1408,13 @@
       "awayTeamName": "Trabzonspor",
       "competitionId": "tsl",
       "kickoffTimeUtc": "2026-11-15T16:00:00Z",
-      "status": "FT",
+      "status": "LIVE",
       "scores": {
         "currentHome": 1,
-        "currentAway": 0,
-        "htHome": 1,
-        "htAway": 0,
-        "minute": 40
+        "currentAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
-      "syncSource": "Persisted-Matchday",
-      "settlement": {
-        "status": "WON",
-        "settledAt": "2026-11-15T07:28:11.230Z",
-        "actualScore": "1 - 0",
-        "htScore": "1 - 0",
-        "markets": {
-          "market1X2": "WON",
-          "marketBTTS": "LOST",
-          "marketOverUnder25": "LOST",
-          "marketDoubleChance": "WON",
-          "marketHtFt": "WON"
-        },
-        "source": "Persisted-Matchday"
-      }
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
+      "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-bel-01": {
       "fixtureId": "fix-bel-01",
@@ -1716,7 +1427,7 @@
         "currentHome": 0,
         "currentAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-bel-02": {
@@ -1732,7 +1443,7 @@
         "htHome": 1,
         "htAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation",
       "settlement": {
         "status": "WON",
@@ -1762,7 +1473,7 @@
         "htHome": 1,
         "htAway": 1
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation",
       "settlement": {
         "status": "WON",
@@ -1785,30 +1496,13 @@
       "awayTeamName": "Western Sydney Wanderers",
       "competitionId": "aleague",
       "kickoffTimeUtc": "2026-11-15T10:45:00Z",
-      "status": "FT",
+      "status": "LIVE",
       "scores": {
         "currentHome": 2,
-        "currentAway": 1,
-        "htHome": 1,
-        "htAway": 0,
-        "minute": 82
+        "currentAway": 1
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
-      "syncSource": "Persisted-Matchday",
-      "settlement": {
-        "status": "WON",
-        "settledAt": "2026-11-15T07:28:11.230Z",
-        "actualScore": "2 - 1",
-        "htScore": "1 - 0",
-        "markets": {
-          "market1X2": "WON",
-          "marketBTTS": "WON",
-          "marketOverUnder25": "WON",
-          "marketDoubleChance": "WON",
-          "marketHtFt": "WON"
-        },
-        "source": "Persisted-Matchday"
-      }
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
+      "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-psl-01": {
       "fixtureId": "fix-psl-01",
@@ -1821,7 +1515,7 @@
         "currentHome": 0,
         "currentAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-psl-02": {
@@ -1837,7 +1531,7 @@
         "htHome": 0,
         "htAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation",
       "settlement": {
         "status": "WON",
@@ -1865,7 +1559,7 @@
         "currentHome": 0,
         "currentAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation"
     },
     "fix-egy-02": {
@@ -1881,7 +1575,7 @@
         "htHome": 1,
         "htAway": 0
       },
-      "lastUpdatedUtc": "2026-11-15T07:25:51.518Z",
+      "lastUpdatedUtc": "2026-11-15T10:08:17.636Z",
       "syncSource": "Verified-Historical-Reconciliation",
       "settlement": {
         "status": "WON",
@@ -1902,40 +1596,40 @@
   "trackedFixtures": [
     {
       "fixtureId": "fix-20261114-01",
-      "homeTeam": "Kosovo",
-      "awayTeam": "Israel",
+      "homeTeam": "Spain",
+      "awayTeam": "England",
       "competitionId": "unl",
       "competition": "UEFA Nations League",
-      "kickoffTimeUtc": "2026-11-15T14:00:00Z"
+      "kickoffTimeUtc": "2026-11-15T19:45:00Z"
     },
     {
       "fixtureId": "fix-20261114-02",
-      "homeTeam": "Sheffield Wednesday",
-      "awayTeam": "Plymouth Argyle",
-      "competitionId": "efl-l1",
-      "competition": "EFL League One",
-      "kickoffTimeUtc": "2026-11-15T15:00:00Z"
+      "homeTeam": "Belgium",
+      "awayTeam": "Italy",
+      "competitionId": "unl",
+      "competition": "UEFA Nations League",
+      "kickoffTimeUtc": "2026-11-15T19:45:00Z"
     },
     {
       "fixtureId": "fix-20261114-03",
-      "homeTeam": "Uganda",
-      "awayTeam": "Botswana",
-      "competitionId": "afcon-q",
-      "competition": "AFCON 2027 Qualifiers",
-      "kickoffTimeUtc": "2026-11-15T16:00:00Z"
+      "homeTeam": "France",
+      "awayTeam": "Türkiye",
+      "competitionId": "unl",
+      "competition": "UEFA Nations League",
+      "kickoffTimeUtc": "2026-11-15T19:45:00Z"
     },
     {
       "fixtureId": "fix-20261114-04",
-      "homeTeam": "Norway",
-      "awayTeam": "Wales",
+      "homeTeam": "Croatia",
+      "awayTeam": "Czechia",
       "competitionId": "unl",
       "competition": "UEFA Nations League",
-      "kickoffTimeUtc": "2026-11-15T17:00:00Z"
+      "kickoffTimeUtc": "2026-11-15T19:45:00Z"
     },
     {
       "fixtureId": "fix-20261114-05",
-      "homeTeam": "Georgia",
-      "awayTeam": "Hungary",
+      "homeTeam": "Finland",
+      "awayTeam": "San Marino",
       "competitionId": "unl",
       "competition": "UEFA Nations League",
       "kickoffTimeUtc": "2026-11-15T17:00:00Z"
@@ -1943,39 +1637,39 @@
     {
       "fixtureId": "fix-20261114-06",
       "homeTeam": "Portugal",
-      "awayTeam": "Denmark",
-      "competitionId": "unl",
-      "competition": "UEFA Nations League",
-      "kickoffTimeUtc": "2026-11-15T19:45:00Z"
-    },
-    {
-      "fixtureId": "fix-20261114-07",
-      "homeTeam": "Austria",
-      "awayTeam": "Republic of Ireland",
-      "competitionId": "unl",
-      "competition": "UEFA Nations League",
-      "kickoffTimeUtc": "2026-11-15T19:45:00Z"
-    },
-    {
-      "fixtureId": "fix-20261114-08",
-      "homeTeam": "Northern Ireland",
-      "awayTeam": "Ukraine",
-      "competitionId": "unl",
-      "competition": "UEFA Nations League",
-      "kickoffTimeUtc": "2026-11-15T19:45:00Z"
-    },
-    {
-      "fixtureId": "fix-20261114-09",
-      "homeTeam": "Romania",
       "awayTeam": "Poland",
       "competitionId": "unl",
       "competition": "UEFA Nations League",
       "kickoffTimeUtc": "2026-11-15T19:45:00Z"
     },
     {
+      "fixtureId": "fix-20261114-07",
+      "homeTeam": "Belarus",
+      "awayTeam": "Albania",
+      "competitionId": "unl",
+      "competition": "UEFA Nations League",
+      "kickoffTimeUtc": "2026-11-15T17:00:00Z"
+    },
+    {
+      "fixtureId": "fix-20261114-08",
+      "homeTeam": "Cyprus",
+      "awayTeam": "Montenegro",
+      "competitionId": "unl",
+      "competition": "UEFA Nations League",
+      "kickoffTimeUtc": "2026-11-15T17:00:00Z"
+    },
+    {
+      "fixtureId": "fix-20261114-09",
+      "homeTeam": "Latvia",
+      "awayTeam": "Armenia",
+      "competitionId": "unl",
+      "competition": "UEFA Nations League",
+      "kickoffTimeUtc": "2026-11-15T14:00:00Z"
+    },
+    {
       "fixtureId": "fix-20261114-10",
-      "homeTeam": "Sweden",
-      "awayTeam": "Bosnia and Herzegovina",
+      "homeTeam": "Denmark",
+      "awayTeam": "Switzerland",
       "competitionId": "unl",
       "competition": "UEFA Nations League",
       "kickoffTimeUtc": "2026-11-15T19:45:00Z"

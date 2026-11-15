@@ -358,171 +358,286 @@ export const MatchDetailModal: React.FC<MatchDetailModalProps> = ({
           )}
 
           {/* TAB 2: ALL 5 MARKETS */}
-          {activeTab === 'markets' && prediction && (
-            <div className="space-y-5">
-              {/* Market 1: 1X2 */}
-              <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800">
-                <h5 className="font-bold text-slate-200 text-sm mb-2 flex items-center justify-between">
-                  <span>1. Full-Time 1X2 Market (Match Winner)</span>
-                  <span className="text-xs font-mono text-emerald-400">Picks: {prediction.market1X2.predictedOutcome}</span>
-                </h5>
-                <div className="grid grid-cols-3 gap-3 text-center">
-                  <div className="p-3 rounded-xl bg-slate-900 border border-slate-800">
-                    <div className="text-xs text-slate-400">1 (Home Win)</div>
-                    <div className="text-lg font-black text-slate-100 mt-1">{formatProb(prediction.market1X2.homeWin)}</div>
-                  </div>
-                  <div className="p-3 rounded-xl bg-slate-900 border border-slate-800">
-                    <div className="text-xs text-slate-400">X (Draw)</div>
-                    <div className="text-lg font-black text-slate-100 mt-1">{formatProb(prediction.market1X2.draw)}</div>
-                  </div>
-                  <div className="p-3 rounded-xl bg-slate-900 border border-slate-800">
-                    <div className="text-xs text-slate-400">2 (Away Win)</div>
-                    <div className="text-lg font-black text-slate-100 mt-1">{formatProb(prediction.market1X2.awayWin)}</div>
-                  </div>
-                </div>
-              </div>
+          {activeTab === 'markets' && prediction && (() => {
+            const isCompleted = fixture.status === 'FT';
+            const h = fixture.scores.currentHome;
+            const a = fixture.scores.currentAway;
+            const actual1X2 = h > a ? '1' : h === a ? 'X' : '2';
+            const actualBTTS = h > 0 && a > 0 ? 'YES' : 'NO';
+            const actualOU25 = (h + a) >= 3 ? 'OVER' : 'UNDER';
+            const actualDC = actual1X2 === '1' ? ['1X', '12'] : actual1X2 === 'X' ? ['1X', 'X2'] : ['X2', '12'];
+            const hasVerifiedHt = typeof fixture.scores.htHome === 'number' && typeof fixture.scores.htAway === 'number';
+            const htH = hasVerifiedHt ? fixture.scores.htHome! : null;
+            const htA = hasVerifiedHt ? fixture.scores.htAway! : null;
+            const actualHtFtOutcome = htH !== null && htA !== null
+              ? `${htH > htA ? 'H' : htH === htA ? 'D' : 'A'}${h > a ? 'H' : h === a ? 'D' : 'A'}`
+              : null;
 
-              {/* Market: 1X2 Interval 10 Minutes (00:01 - 09:59) */}
-              {prediction.market1X2Interval10 && (
-                <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h5 className="font-bold text-slate-200 text-sm flex items-center gap-2">
-                        <span>2. 1X2 - Interval 10 Minutes (00:01 - 09:59)</span>
-                        <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800">
-                          Time-Slice Poisson
+            return (
+              <div className="space-y-5">
+                {/* Market 1: 1X2 */}
+                <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800">
+                  <h5 className="font-bold text-slate-200 text-sm mb-2 flex items-center justify-between">
+                    <span>1. Full-Time 1X2 Market (Match Winner)</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-mono text-emerald-400">Pick: {prediction.market1X2.predictedOutcome}</span>
+                      {isCompleted && (
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold flex items-center gap-1 ${
+                          prediction.market1X2.predictedOutcome === actual1X2
+                            ? 'bg-emerald-950 text-emerald-400 border border-emerald-800'
+                            : 'bg-rose-950 text-rose-400 border border-rose-800'
+                        }`}>
+                          {prediction.market1X2.predictedOutcome === actual1X2 ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
+                          {prediction.market1X2.predictedOutcome === actual1X2 ? 'WON' : 'LOST'}
                         </span>
-                      </h5>
-                      <p className="text-xs text-slate-400 mt-0.5">
-                        Predicted match leader at the end of the opening 10 minutes (09:59).
-                      </p>
+                      )}
                     </div>
-                    <span className="text-xs font-mono text-emerald-400 font-bold">
-                      Pick: {prediction.market1X2Interval10.predictedOutcome}
-                    </span>
-                  </div>
-
+                  </h5>
                   <div className="grid grid-cols-3 gap-3 text-center">
-                    <div className={`p-3 rounded-xl border ${
-                      prediction.market1X2Interval10.predictedOutcome === '1'
-                        ? 'bg-emerald-950/40 border-emerald-500/60 text-emerald-300'
-                        : 'bg-slate-900 border-slate-800 text-slate-300'
-                    }`}>
-                      <div className="text-xs text-slate-400">1 (Home Leads)</div>
-                      <div className="text-lg font-black mt-1">
-                        {formatProb(prediction.market1X2Interval10.homeWin)}
-                      </div>
-                      <div className="text-[10px] text-slate-500 mt-0.5">e.g. 1-0 at 09:59</div>
+                    <div className="p-3 rounded-xl bg-slate-900 border border-slate-800">
+                      <div className="text-xs text-slate-400">1 (Home Win)</div>
+                      <div className="text-lg font-black text-slate-100 mt-1">{formatProb(prediction.market1X2.homeWin)}</div>
                     </div>
-
-                    <div className={`p-3 rounded-xl border ${
-                      prediction.market1X2Interval10.predictedOutcome === 'X'
-                        ? 'bg-emerald-950/40 border-emerald-500/60 text-emerald-300'
-                        : 'bg-slate-900 border-slate-800 text-slate-300'
-                    }`}>
-                      <div className="text-xs text-slate-400">X (Tied / Draw)</div>
-                      <div className="text-lg font-black mt-1">
-                        {formatProb(prediction.market1X2Interval10.draw)}
-                      </div>
-                      <div className="text-[10px] text-slate-500 mt-0.5">e.g. 0-0, 1-1 at 09:59</div>
+                    <div className="p-3 rounded-xl bg-slate-900 border border-slate-800">
+                      <div className="text-xs text-slate-400">X (Draw)</div>
+                      <div className="text-lg font-black text-slate-100 mt-1">{formatProb(prediction.market1X2.draw)}</div>
                     </div>
-
-                    <div className={`p-3 rounded-xl border ${
-                      prediction.market1X2Interval10.predictedOutcome === '2'
-                        ? 'bg-emerald-950/40 border-emerald-500/60 text-emerald-300'
-                        : 'bg-slate-900 border-slate-800 text-slate-300'
-                    }`}>
-                      <div className="text-xs text-slate-400">2 (Away Leads)</div>
-                      <div className="text-lg font-black mt-1">
-                        {formatProb(prediction.market1X2Interval10.awayWin)}
-                      </div>
-                      <div className="text-[10px] text-slate-500 mt-0.5">e.g. 0-1 at 09:59</div>
+                    <div className="p-3 rounded-xl bg-slate-900 border border-slate-800">
+                      <div className="text-xs text-slate-400">2 (Away Win)</div>
+                      <div className="text-lg font-black text-slate-100 mt-1">{formatProb(prediction.market1X2.awayWin)}</div>
                     </div>
                   </div>
+                </div>
 
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs p-3 rounded-xl bg-slate-900 border border-slate-850 gap-2">
-                    <span className="text-slate-400">
-                      Probability of any goal scored before 10:00:
-                    </span>
-                    <div className="flex items-center gap-3">
-                      <span className="font-mono font-bold text-emerald-400">
-                        {formatProb(prediction.market1X2Interval10.earlyGoalProbability)}
-                      </span>
-                      <span className="text-slate-600">|</span>
+                {/* Market: 1X2 Interval 10 Minutes (00:01 - 09:59) */}
+                {prediction.market1X2Interval10 && (
+                  <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h5 className="font-bold text-slate-200 text-sm flex items-center gap-2">
+                          <span>2. 1X2 - Interval 10 Minutes (00:01 - 09:59)</span>
+                          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800">
+                            Time-Slice Poisson
+                          </span>
+                        </h5>
+                        <p className="text-xs text-slate-400 mt-0.5">
+                          Predicted match leader at the end of the opening 10 minutes (09:59).
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-mono text-emerald-400 font-bold">
+                          Pick: {prediction.market1X2Interval10.predictedOutcome}
+                        </span>
+                        {isCompleted && (
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold flex items-center gap-1 ${
+                            prediction.market1X2Interval10.predictedOutcome === 'X'
+                              ? 'bg-emerald-950 text-emerald-400 border border-emerald-800'
+                              : 'bg-rose-950 text-rose-400 border border-rose-800'
+                          }`}>
+                            {prediction.market1X2Interval10.predictedOutcome === 'X' ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
+                            {prediction.market1X2Interval10.predictedOutcome === 'X' ? 'WON' : 'LOST'}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-3 text-center">
+                      <div className={`p-3 rounded-xl border ${
+                        prediction.market1X2Interval10.predictedOutcome === '1'
+                          ? 'bg-emerald-950/40 border-emerald-500/60 text-emerald-300'
+                          : 'bg-slate-900 border-slate-800 text-slate-300'
+                      }`}>
+                        <div className="text-xs text-slate-400">1 (Home Leads)</div>
+                        <div className="text-lg font-black mt-1">
+                          {formatProb(prediction.market1X2Interval10.homeWin)}
+                        </div>
+                        <div className="text-[10px] text-slate-500 mt-0.5">e.g. 1-0 at 09:59</div>
+                      </div>
+
+                      <div className={`p-3 rounded-xl border ${
+                        prediction.market1X2Interval10.predictedOutcome === 'X'
+                          ? 'bg-emerald-950/40 border-emerald-500/60 text-emerald-300'
+                          : 'bg-slate-900 border-slate-800 text-slate-300'
+                      }`}>
+                        <div className="text-xs text-slate-400">X (Tied / Draw)</div>
+                        <div className="text-lg font-black mt-1">
+                          {formatProb(prediction.market1X2Interval10.draw)}
+                        </div>
+                        <div className="text-[10px] text-slate-500 mt-0.5">e.g. 0-0, 1-1 at 09:59</div>
+                      </div>
+
+                      <div className={`p-3 rounded-xl border ${
+                        prediction.market1X2Interval10.predictedOutcome === '2'
+                          ? 'bg-emerald-950/40 border-emerald-500/60 text-emerald-300'
+                          : 'bg-slate-900 border-slate-800 text-slate-300'
+                      }`}>
+                        <div className="text-xs text-slate-400">2 (Away Leads)</div>
+                        <div className="text-lg font-black mt-1">
+                          {formatProb(prediction.market1X2Interval10.awayWin)}
+                        </div>
+                        <div className="text-[10px] text-slate-500 mt-0.5">e.g. 0-1 at 09:59</div>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs p-3 rounded-xl bg-slate-900 border border-slate-850 gap-2">
                       <span className="text-slate-400">
-                        Most Likely 10m Score:{' '}
-                        <strong className="text-slate-200 font-mono">
-                          {prediction.market1X2Interval10.mostLikelyScore}
-                        </strong>
+                        Probability of any goal scored before 10:00:
                       </span>
+                      <div className="flex items-center gap-3">
+                        <span className="font-mono font-bold text-emerald-400">
+                          {formatProb(prediction.market1X2Interval10.earlyGoalProbability)}
+                        </span>
+                        <span className="text-slate-600">|</span>
+                        <span className="text-slate-400">
+                          Most Likely 10m Score:{' '}
+                          <strong className="text-slate-200 font-mono">
+                            {prediction.market1X2Interval10.mostLikelyScore}
+                          </strong>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Market 2 & 3: BTTS and Over/Under */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800">
+                    <h5 className="font-bold text-slate-200 text-sm mb-2 flex items-center justify-between">
+                      <span>2. Both Teams To Score (BTTS)</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-mono text-emerald-400">Pick: {prediction.marketBTTS.predictedOutcome}</span>
+                        {isCompleted && (
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold flex items-center gap-1 ${
+                            prediction.marketBTTS.predictedOutcome === actualBTTS
+                              ? 'bg-emerald-950 text-emerald-400 border border-emerald-800'
+                              : 'bg-rose-950 text-rose-400 border border-rose-800'
+                          }`}>
+                            {prediction.marketBTTS.predictedOutcome === actualBTTS ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
+                            {prediction.marketBTTS.predictedOutcome === actualBTTS ? 'WON' : 'LOST'}
+                          </span>
+                        )}
+                      </div>
+                    </h5>
+                    <div className="grid grid-cols-2 gap-3 text-center">
+                      <div className="p-3 rounded-xl bg-slate-900 border border-slate-800">
+                        <div className="text-xs text-slate-400">Yes</div>
+                        <div className="text-lg font-black text-emerald-300 mt-1">{formatProb(prediction.marketBTTS.yes)}</div>
+                      </div>
+                      <div className="p-3 rounded-xl bg-slate-900 border border-slate-800">
+                        <div className="text-xs text-slate-400">No</div>
+                        <div className="text-lg font-black text-slate-300 mt-1">{formatProb(prediction.marketBTTS.no)}</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800">
+                    <h5 className="font-bold text-slate-200 text-sm mb-2 flex items-center justify-between">
+                      <span>3. Over / Under 2.5 Total Goals</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-mono text-emerald-400">Pick: {prediction.marketOverUnder25.predictedOutcome}</span>
+                        {isCompleted && (
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold flex items-center gap-1 ${
+                            prediction.marketOverUnder25.predictedOutcome === actualOU25
+                              ? 'bg-emerald-950 text-emerald-400 border border-emerald-800'
+                              : 'bg-rose-950 text-rose-400 border border-rose-800'
+                          }`}>
+                            {prediction.marketOverUnder25.predictedOutcome === actualOU25 ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
+                            {prediction.marketOverUnder25.predictedOutcome === actualOU25 ? 'WON' : 'LOST'}
+                          </span>
+                        )}
+                      </div>
+                    </h5>
+                    <div className="grid grid-cols-2 gap-3 text-center">
+                      <div className="p-3 rounded-xl bg-slate-900 border border-slate-800">
+                        <div className="text-xs text-slate-400">Over 2.5</div>
+                        <div className="text-lg font-black text-emerald-300 mt-1">{formatProb(prediction.marketOverUnder25.over)}</div>
+                      </div>
+                      <div className="p-3 rounded-xl bg-slate-900 border border-slate-800">
+                        <div className="text-xs text-slate-400">Under 2.5</div>
+                        <div className="text-lg font-black text-slate-300 mt-1">{formatProb(prediction.marketOverUnder25.under)}</div>
+                      </div>
                     </div>
                   </div>
                 </div>
-              )}
 
-              {/* Market 2 & 3: BTTS and Over/Under */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Market 4: Double Chance */}
                 <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800">
-                  <h5 className="font-bold text-slate-200 text-sm mb-2">2. Both Teams To Score (BTTS)</h5>
-                  <div className="grid grid-cols-2 gap-3 text-center">
+                  <h5 className="font-bold text-slate-200 text-sm mb-2 flex items-center justify-between">
+                    <span>4. Double Chance (Derived Directly from 1X2 Probabilities)</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-mono text-emerald-400">Pick: {prediction.marketDoubleChance.predictedOutcome}</span>
+                      {isCompleted && (
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold flex items-center gap-1 ${
+                          actualDC.includes(prediction.marketDoubleChance.predictedOutcome)
+                            ? 'bg-emerald-950 text-emerald-400 border border-emerald-800'
+                            : 'bg-rose-950 text-rose-400 border border-rose-800'
+                        }`}>
+                          {actualDC.includes(prediction.marketDoubleChance.predictedOutcome) ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
+                          {actualDC.includes(prediction.marketDoubleChance.predictedOutcome) ? 'WON' : 'LOST'}
+                        </span>
+                      )}
+                    </div>
+                  </h5>
+                  <div className="grid grid-cols-3 gap-3 text-center">
                     <div className="p-3 rounded-xl bg-slate-900 border border-slate-800">
-                      <div className="text-xs text-slate-400">Yes</div>
-                      <div className="text-lg font-black text-emerald-300 mt-1">{formatProb(prediction.marketBTTS.yes)}</div>
+                      <div className="text-xs text-slate-400">1X (Home or Draw)</div>
+                      <div className="text-lg font-black text-slate-100 mt-1">{formatProb(prediction.marketDoubleChance['1X'])}</div>
                     </div>
                     <div className="p-3 rounded-xl bg-slate-900 border border-slate-800">
-                      <div className="text-xs text-slate-400">No</div>
-                      <div className="text-lg font-black text-slate-300 mt-1">{formatProb(prediction.marketBTTS.no)}</div>
+                      <div className="text-xs text-slate-400">12 (Home or Away)</div>
+                      <div className="text-lg font-black text-slate-100 mt-1">{formatProb(prediction.marketDoubleChance['12'])}</div>
+                    </div>
+                    <div className="p-3 rounded-xl bg-slate-900 border border-slate-800">
+                      <div className="text-xs text-slate-400">X2 (Draw or Away)</div>
+                      <div className="text-lg font-black text-slate-100 mt-1">{formatProb(prediction.marketDoubleChance['X2'])}</div>
                     </div>
                   </div>
                 </div>
 
+                {/* Market 5: HT/FT 9 Combinations */}
                 <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800">
-                  <h5 className="font-bold text-slate-200 text-sm mb-2">3. Over / Under 2.5 Total Goals</h5>
-                  <div className="grid grid-cols-2 gap-3 text-center">
-                    <div className="p-3 rounded-xl bg-slate-900 border border-slate-800">
-                      <div className="text-xs text-slate-400">Over 2.5</div>
-                      <div className="text-lg font-black text-emerald-300 mt-1">{formatProb(prediction.marketOverUnder25.over)}</div>
+                  <h5 className="font-bold text-slate-200 text-sm mb-3 flex items-center justify-between">
+                    <span>5. Half-Time / Full-Time (HT/FT) All 9 Joint Combinations</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-mono text-emerald-400">Pick: {prediction.marketHtFt.predictedOutcome}</span>
+                      {isCompleted && (
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold flex items-center gap-1 ${
+                          actualHtFtOutcome && prediction.marketHtFt.predictedOutcome === actualHtFtOutcome
+                            ? 'bg-emerald-950 text-emerald-400 border border-emerald-800'
+                            : 'bg-rose-950 text-rose-400 border border-rose-800'
+                        }`}>
+                          {actualHtFtOutcome && prediction.marketHtFt.predictedOutcome === actualHtFtOutcome ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
+                          {actualHtFtOutcome && prediction.marketHtFt.predictedOutcome === actualHtFtOutcome ? 'WON' : 'LOST'}
+                        </span>
+                      )}
                     </div>
-                    <div className="p-3 rounded-xl bg-slate-900 border border-slate-800">
-                      <div className="text-xs text-slate-400">Under 2.5</div>
-                      <div className="text-lg font-black text-slate-300 mt-1">{formatProb(prediction.marketOverUnder25.under)}</div>
-                    </div>
+                  </h5>
+                  <div className="grid grid-cols-3 gap-2 text-center text-xs">
+                    {(Object.keys(prediction.marketHtFt.probabilities) as HtFtOutcome[]).map((key) => {
+                      const prob = prediction.marketHtFt.probabilities[key];
+                      const isPick = prediction.marketHtFt.predictedOutcome === key;
+                      return (
+                        <div
+                          key={key}
+                          className={`p-2 rounded-xl border ${
+                            isPick
+                              ? 'bg-emerald-950/40 border-emerald-500/60 text-emerald-300'
+                              : 'bg-slate-900 border-slate-800 text-slate-300'
+                          }`}
+                        >
+                          <div className="text-[11px] font-mono font-bold text-slate-400">{key}</div>
+                          <div className="font-bold text-sm mt-0.5">{formatProb(prob)}</div>
+                          {isPick && (
+                            <div className="text-[9px] uppercase font-bold text-emerald-400 mt-0.5">Pick</div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
-
-              {/* Market 4: Double Chance */}
-              <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800">
-                <h5 className="font-bold text-slate-200 text-sm mb-2">
-                  4. Double Chance (Derived Directly from 1X2 Probabilities)
-                </h5>
-                <div className="grid grid-cols-3 gap-3 text-center">
-                  <div className="p-3 rounded-xl bg-slate-900 border border-slate-800">
-                    <div className="text-xs text-slate-400">1X (Home or Draw)</div>
-                    <div className="text-lg font-black text-slate-100 mt-1">{formatProb(prediction.marketDoubleChance['1X'])}</div>
-                  </div>
-                  <div className="p-3 rounded-xl bg-slate-900 border border-slate-800">
-                    <div className="text-xs text-slate-400">12 (Home or Away)</div>
-                    <div className="text-lg font-black text-slate-100 mt-1">{formatProb(prediction.marketDoubleChance['12'])}</div>
-                  </div>
-                  <div className="p-3 rounded-xl bg-slate-900 border border-slate-800">
-                    <div className="text-xs text-slate-400">X2 (Draw or Away)</div>
-                    <div className="text-lg font-black text-slate-100 mt-1">{formatProb(prediction.marketDoubleChance['X2'])}</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Market 5: HT/FT 9 Combinations */}
-              <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800">
-                <h5 className="font-bold text-slate-200 text-sm mb-3">
-                  5. Half-Time / Full-Time (HT/FT) All 9 Joint Combinations
-                </h5>
-                <div className="grid grid-cols-3 gap-2 text-center text-xs">
-                  {(Object.keys(prediction.marketHtFt.probabilities) as HtFtOutcome[]).map((key) => {
-                    const prob = prediction.marketHtFt.probabilities[key];
-                    const isPick = prediction.marketHtFt.predictedOutcome === key;
-                    return (
-                      <div
+            );
+          })()}
                         key={key}
                         className={`p-2 rounded-xl border ${
                           isPick ? 'bg-emerald-950/60 border-emerald-500 text-emerald-300' : 'bg-slate-900 border-slate-800 text-slate-300'
