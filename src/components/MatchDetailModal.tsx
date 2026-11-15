@@ -638,20 +638,6 @@ export const MatchDetailModal: React.FC<MatchDetailModalProps> = ({
               </div>
             );
           })()}
-                        key={key}
-                        className={`p-2 rounded-xl border ${
-                          isPick ? 'bg-emerald-950/60 border-emerald-500 text-emerald-300' : 'bg-slate-900 border-slate-800 text-slate-300'
-                        }`}
-                      >
-                        <div className="font-mono font-bold text-slate-400">{key}</div>
-                        <div className="text-sm font-extrabold text-slate-100 mt-0.5">{formatProb(prob)}</div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          )}
 
           {/* TAB 3: TACTICAL SCOUT (GOOGLE SEARCH GROUNDED) */}
           {activeTab === 'scout' && (
