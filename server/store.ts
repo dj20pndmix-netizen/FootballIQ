@@ -223,6 +223,7 @@ export function upsertFixtureUpdate(incoming: ServerFixtureUpdate): boolean {
         ? incoming.lastUpdatedUtc
         : existing.lastUpdatedUtc,
     syncSource: incoming.syncSource || existing.syncSource,
+    settlement: incoming.settlement || existing.settlement,
   };
   return scoreChanged;
 }
