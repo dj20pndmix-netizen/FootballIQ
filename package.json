@@ -8,7 +8,7 @@
     "build": "vite build",
     "start": "tsx server.ts",
     "preview": "vite preview",
-    "test": "tsx test/prediction_engine.test.ts && tsx test/integration_security_ui.test.ts && tsx test/opta_integration.test.ts",
+    "test": "tsx test/prediction_engine.test.ts && tsx test/integration_security_ui.test.ts && tsx test/opta_integration.test.ts && tsx --test test/scheduling_settlement_calibration.test.ts",
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit"
   },
