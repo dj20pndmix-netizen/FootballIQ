@@ -201,6 +201,78 @@ assert(
   `Re-settled actual score string matches "${settledWithHt.prediction?.settlement?.actualScore}"`
 );
 
+// --- 12. Automated Dynamic Daily Matchday & Kampala Midnight Rollover Tests ---
+console.log('\n--- 12. Automated Dynamic Daily Matchday & Kampala Midnight Rollover Tests ---');
+const {
+  getLocalDateString,
+  getFixtureLocalDate,
+  formatLocalDateLabel,
+  isFixturePlayingOnLocalDate,
+  getMsUntilMidnight,
+  formatCountdownToMidnight,
+} = await import('../src/utils/timezone.ts');
+
+const {
+  generateMatchdaySlateForDate,
+  filterFixturesStrictlyForDate,
+  getAutomatedMatchdayState,
+} = await import('../src/services/matchdayService.ts');
+
+const fixedNow = new Date('2026-11-15T07:00:00Z');
+const kampalaDate = getLocalDateString(fixedNow, 'Africa/Kampala');
+assert(kampalaDate === '2026-11-15', `getLocalDateString in Africa/Kampala returns '2026-11-15' (actual: ${kampalaDate})`);
+
+const countdown = formatCountdownToMidnight(fixedNow, 'Africa/Kampala');
+assert(typeof countdown === 'string' && countdown.includes('h'), `formatCountdownToMidnight returns valid countdown (actual: ${countdown})`);
+
+const msToMidnight = getMsUntilMidnight(fixedNow, 'Africa/Kampala');
+assert(msToMidnight > 0 && msToMidnight <= 86400000, `getMsUntilMidnight returns positive milliseconds <= 24h (actual: ${msToMidnight})`);
+
+// Strict date filtering on 2026-11-15
+const todayStrictFixtures = filterFixturesStrictlyForDate(fixtures, '2026-11-15', 'Africa/Kampala');
+assert(
+  todayStrictFixtures.length === 58,
+  `Strict date filter isolates only the 58 matches playing on 15 Nov (actual: ${todayStrictFixtures.length})`
+);
+assert(
+  todayStrictFixtures.every((f) => getFixtureLocalDate(f.kickoffTimeUtc, 'Africa/Kampala') === '2026-11-15'),
+  'Every single strictly filtered fixture has local kickoff date equal to 2026-11-15'
+);
+
+// Automated matchday slate generation for tomorrow (2026-11-16)
+const tomorrowSlate = generateMatchdaySlateForDate('2026-11-16', 'Africa/Kampala');
+assert(tomorrowSlate.length >= 40, `Automated generator created full matchday slate for 2026-11-16 (actual: ${tomorrowSlate.length})`);
+assert(
+  tomorrowSlate.every((f) => getFixtureLocalDate(f.kickoffTimeUtc, 'Africa/Kampala') === '2026-11-16'),
+  'All dynamically scheduled matches for 2026-11-16 have local kickoff strictly on 2026-11-16'
+);
+
+// Verify quantitative predictions for all dynamically generated fixtures
+const sampleGenFixture = tomorrowSlate[0];
+assert(sampleGenFixture.prediction !== undefined, 'Dynamically generated fixture carries QuantitativePrediction');
+const gen1X2Sum = Number(
+  (
+    sampleGenFixture.prediction!.market1X2.homeWin +
+    sampleGenFixture.prediction!.market1X2.draw +
+    sampleGenFixture.prediction!.market1X2.awayWin
+  ).toFixed(4)
+);
+assert(gen1X2Sum === 1.0, `Dynamically generated 1X2 market probabilities sum to 1.0 (actual: ${gen1X2Sum})`);
+
+const genBttsSum = Number(
+  (
+    sampleGenFixture.prediction!.marketBTTS.yes +
+    sampleGenFixture.prediction!.marketBTTS.no
+  ).toFixed(4)
+);
+assert(genBttsSum === 1.0, `Dynamically generated BTTS market probabilities sum to 1.0 (actual: ${genBttsSum})`);
+
+// Test metadata state calculation
+const matchdayState = getAutomatedMatchdayState(fixtures, '2026-11-15', 'Africa/Kampala');
+assert(matchdayState.todayFixturesCount === 58, `Automated matchday state reports 58 today fixtures (actual: ${matchdayState.todayFixturesCount})`);
+assert(matchdayState.upcomingCount === 40, `Automated matchday state reports 40 upcoming fixtures (actual: ${matchdayState.upcomingCount})`);
+assert(matchdayState.liveCount === 18, `Automated matchday state reports 18 live fixtures (actual: ${matchdayState.liveCount})`);
+
 console.log('\n================================================================');
 console.log(`TOTAL TESTS: ${passed + failed} | PASSED: ${passed} | FAILED: ${failed}`);
 console.log('================================================================');

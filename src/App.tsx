@@ -48,6 +48,17 @@ import {
   fetchServerSyncState,
   triggerServerFixtureSync,
 } from './services/syncService';
+import { MatchdayDateNavigator } from './components/MatchdayDateNavigator';
+import {
+  generateMatchdaySlateForDate,
+  filterFixturesStrictlyForDate,
+  getAutomatedMatchdayState,
+} from './services/matchdayService';
+import {
+  getLocalDateString,
+  getFixtureLocalDate,
+  formatLocalDateLabel,
+} from './utils/timezone';
 import { onAuthStateChanged } from 'firebase/auth';
 import {
   Search,
@@ -59,6 +70,7 @@ import {
   Clock,
   Flame,
   Calendar,
+  Sparkles,
 } from 'lucide-react';
 
 const SIDEBAR_STORAGE_KEY = 'footballiq_sidebar_collapsed';
@@ -109,6 +121,13 @@ export default function App() {
   const [selectedCompetition, setSelectedCompetition] = useState<string>('ALL');
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState<string>('');
+
+  // Automated Matchday Date State (Defaults to Kampala calendar date)
+  const [activeMatchdayDate, setActiveMatchdayDate] = useState<string>(() => {
+    return getLocalDateString(new Date(), 'Africa/Kampala');
+  });
+  const [rolloverNotice, setRolloverNotice] = useState<string | null>(null);
+  const [isGeneratingDailySlate, setIsGeneratingDailySlate] = useState<boolean>(false);
 
   const fixturesRef = useRef<Fixture[]>([]);
   const userRef = useRef<UserProfile | null>(null);
@@ -358,8 +377,72 @@ export default function App() {
     };
   }, [autoSyncEnabled, runUnifiedSync]);
 
+  // Automated Daily Matchday Transition & Slate Generator
+  const handleDateChange = useCallback((newDateStr: string) => {
+    setActiveMatchdayDate(newDateStr);
+    setIsGeneratingDailySlate(true);
+    try {
+      if (newDateStr === '2026-11-15') {
+        const baseline = getInitialFixtures();
+        const cachedUpdates = loadFixtureUpdatesFromCache();
+        const merged = mergeFixtureUpdates(baseline, cachedUpdates);
+        setFixtures(merged);
+        fixturesRef.current = merged;
+      } else {
+        const generatedSlate = generateMatchdaySlateForDate(newDateStr, selectedTimezone);
+        setFixtures(generatedSlate);
+        fixturesRef.current = generatedSlate;
+        saveFixtureUpdatesToCache(generatedSlate);
+      }
+      setRolloverNotice(
+        `Automated Matchday Slate Active: Showing matches strictly for ${formatLocalDateLabel(newDateStr)} (${selectedTimezone}).`
+      );
+      setTimeout(() => setRolloverNotice(null), 6000);
+    } catch (err: any) {
+      console.error('Error generating daily slate:', err);
+    } finally {
+      setIsGeneratingDailySlate(false);
+    }
+  }, [selectedTimezone]);
+
+  const handleSimulateMidnightRollover = useCallback(() => {
+    const [y, m, d] = activeMatchdayDate.split('-').map(Number);
+    const nextDate = new Date(Date.UTC(y, m - 1, d + 1, 12, 0, 0));
+    const nextDateStr = nextDate.toISOString().slice(0, 10);
+    handleDateChange(nextDateStr);
+    setRolloverNotice(
+      `🌙 Midnight Rollover Simulated: Date transitioned to ${formatLocalDateLabel(nextDateStr)} in ${selectedTimezone}. Quantitative engine generated fresh probabilities.`
+    );
+    setTimeout(() => setRolloverNotice(null), 8000);
+  }, [activeMatchdayDate, selectedTimezone, handleDateChange]);
+
+  // Automated Midnight Rollover Watcher: polls every 15s for calendar date transition in selected timezone
+  useEffect(() => {
+    const checkMidnight = () => {
+      const todayInTz = getLocalDateString(new Date(), selectedTimezone);
+      if (todayInTz !== activeMatchdayDate) {
+        console.log(`[FootballIQ] Midnight rollover: ${activeMatchdayDate} -> ${todayInTz}`);
+        handleDateChange(todayInTz);
+        setRolloverNotice(
+          `🌙 Midnight reached in ${selectedTimezone}! Automatically updated matchday to ${formatLocalDateLabel(todayInTz)}.`
+        );
+        setTimeout(() => setRolloverNotice(null), 8000);
+      }
+    };
+
+    const interval = setInterval(checkMidnight, 15_000);
+    return () => clearInterval(interval);
+  }, [activeMatchdayDate, selectedTimezone, handleDateChange]);
+
+  // Strict Daily Match Filter:
+  // Strictly filter fixtures to only those playing on activeMatchdayDate in selectedTimezone
+  const dateFilteredFixtures = fixtures.filter((f) => {
+    const localDate = getFixtureLocalDate(f.kickoffTimeUtc, selectedTimezone);
+    return localDate === activeMatchdayDate;
+  });
+
   // Filter fixtures across world leagues, regions, and search
-  const filteredFixtures = fixtures.filter((f) => {
+  const filteredFixtures = dateFilteredFixtures.filter((f) => {
     if (selectedRegion !== 'ALL' && f.competition.region !== selectedRegion) {
       return false;
     }
@@ -379,9 +462,15 @@ export default function App() {
     return true;
   });
 
-  const liveMatches = fixtures.filter((f) => f.status === 'LIVE');
-  const upcomingMatches = fixtures.filter((f) => f.status === 'NS');
-  const completedMatches = fixtures.filter((f) => f.status === 'FT');
+  const liveMatches = dateFilteredFixtures.filter((f) => f.status === 'LIVE');
+  const upcomingMatches = dateFilteredFixtures.filter((f) => f.status === 'NS');
+  const completedMatches = dateFilteredFixtures.filter((f) => f.status === 'FT');
+
+  const matchdayState = getAutomatedMatchdayState(
+    fixtures,
+    activeMatchdayDate,
+    selectedTimezone
+  );
 
   const handleLaunchVeo = (fixture: Fixture) => {
     setSelectedFixture(fixture);
@@ -469,6 +558,7 @@ export default function App() {
           oddsFormat={oddsFormat}
           setOddsFormat={setOddsFormat}
           user={user}
+          activeDateLabel={matchdayState.activeDateLabel}
           onOpenGoogleDriveSync={() => setIsGoogleDriveOpen(true)}
           onSignOut={() => {
             signOutUser();
@@ -485,7 +575,7 @@ export default function App() {
               <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4 border-b border-slate-800/80">
                 <div className="space-y-1">
                   <div className="text-xs text-slate-400 font-mono tabular-nums flex items-center gap-2">
-                    <span>{MATCHDAY_DATE_LABEL}</span>
+                    <span>{matchdayState.activeDateLabel}</span>
                     <span aria-hidden="true">·</span>
                     <span className="text-emerald-400 font-medium">30 World Leagues &amp; Competitions</span>
                     <span aria-hidden="true">·</span>
@@ -591,50 +681,36 @@ export default function App() {
                 </div>
               )}
 
+              {/* Automated Midnight Rollover & Date Transition Alert */}
+              {rolloverNotice && (
+                <div className="p-3.5 rounded-xl bg-emerald-950/70 border border-emerald-500/50 text-emerald-200 text-xs flex items-center justify-between gap-3 shadow-md animate-fade-in">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-emerald-400 shrink-0 animate-spin" />
+                    <span className="font-medium">{rolloverNotice}</span>
+                  </div>
+                  <button
+                    onClick={() => setRolloverNotice(null)}
+                    className="text-emerald-400 hover:text-white"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
+
+              {/* Dynamic Matchday Date Navigator & Midnight Countdown */}
+              <MatchdayDateNavigator
+                matchdayState={matchdayState}
+                onChangeDate={handleDateChange}
+                onSimulateMidnightRollover={handleSimulateMidnightRollover}
+                isLoading={isGeneratingDailySlate}
+              />
+
               {/* Compact Won / Lost / Pending Bar Graph Snapshot */}
               <PredictionOutcomeBarGraph
                 fixtures={fixtures}
                 compact
                 onNavigateToFullCalibration={() => setActiveTab('calibration')}
               />
-
-              {/* Matchday Slate Active Date & Verified Fixtures Banner */}
-              <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 rounded-2xl bg-slate-900/90 border border-slate-800 shadow-sm backdrop-blur-sm">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
-                    <Calendar className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-white tracking-wide">
-                        Matchday Slate: Sunday, 15 November 2026
-                      </span>
-                      <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-mono font-semibold">
-                        Upcoming Matches Active
-                      </span>
-                    </div>
-                    <p className="text-[11px] text-slate-400">
-                      Real-time Poisson &amp; Dixon-Coles probabilities for today's upcoming fixtures across 30 world leagues.
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 text-xs font-mono text-slate-400">
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                    <span>Upcoming: <strong className="text-emerald-300">{upcomingMatches.length}</strong></span>
-                  </div>
-                  <span>•</span>
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-amber-400" />
-                    <span>Live: <strong className="text-amber-300">{liveMatches.length}</strong></span>
-                  </div>
-                  <span>•</span>
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-slate-500" />
-                    <span>Settled: <strong className="text-slate-300">{completedMatches.length}</strong></span>
-                  </div>
-                </div>
-              </div>
 
               {/* Compact Unified Filter & Market Toolbar */}
               <div className="rounded-2xl bg-slate-900 border border-slate-800 p-4 space-y-3">
@@ -647,8 +723,8 @@ export default function App() {
                   {WORLD_REGIONS.map((reg) => {
                     const isSelected = selectedRegion === reg;
                     const count = reg === 'ALL'
-                      ? fixtures.length
-                      : fixtures.filter((f) => f.competition.region === reg).length;
+                      ? dateFilteredFixtures.length
+                      : dateFilteredFixtures.filter((f) => f.competition.region === reg).length;
                     const badgeMap: Record<string, string> = {
                       ALL: '🌐',
                       Europe: '🇪🇺',
@@ -711,13 +787,13 @@ export default function App() {
                     className="rounded-lg bg-slate-950 border border-slate-800 px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-emerald-500 cursor-pointer max-w-[260px] truncate"
                   >
                     <option value="ALL">
-                      All Leagues ({fixtures.filter((f) => selectedRegion === 'ALL' || f.competition.region === selectedRegion).length})
+                      All Leagues ({dateFilteredFixtures.filter((f) => selectedRegion === 'ALL' || f.competition.region === selectedRegion).length})
                     </option>
                     {selectedRegion === 'ALL' ? (
                       <>
                         <optgroup label="🇪🇺 Europe Top Flight">
                           {COMPETITIONS.filter((c) => c.region === 'Europe').map((c) => {
-                            const count = fixtures.filter((f) => f.competition.id === c.id).length;
+                            const count = dateFilteredFixtures.filter((f) => f.competition.id === c.id).length;
                             return (
                               <option key={c.id} value={c.id}>
                                 {c.logo} {c.name} {count > 0 ? `(${count})` : ''}
@@ -727,7 +803,7 @@ export default function App() {
                         </optgroup>
                         <optgroup label="🌎 Americas">
                           {COMPETITIONS.filter((c) => c.region === 'Americas').map((c) => {
-                            const count = fixtures.filter((f) => f.competition.id === c.id).length;
+                            const count = dateFilteredFixtures.filter((f) => f.competition.id === c.id).length;
                             return (
                               <option key={c.id} value={c.id}>
                                 {c.logo} {c.name} {count > 0 ? `(${count})` : ''}
@@ -737,7 +813,7 @@ export default function App() {
                         </optgroup>
                         <optgroup label="🌍 Africa">
                           {COMPETITIONS.filter((c) => c.region === 'Africa').map((c) => {
-                            const count = fixtures.filter((f) => f.competition.id === c.id).length;
+                            const count = dateFilteredFixtures.filter((f) => f.competition.id === c.id).length;
                             return (
                               <option key={c.id} value={c.id}>
                                 {c.logo} {c.name} {count > 0 ? `(${count})` : ''}
@@ -747,7 +823,7 @@ export default function App() {
                         </optgroup>
                         <optgroup label="🌏 Asia & Oceania">
                           {COMPETITIONS.filter((c) => c.region === 'Asia & Oceania').map((c) => {
-                            const count = fixtures.filter((f) => f.competition.id === c.id).length;
+                            const count = dateFilteredFixtures.filter((f) => f.competition.id === c.id).length;
                             return (
                               <option key={c.id} value={c.id}>
                                 {c.logo} {c.name} {count > 0 ? `(${count})` : ''}
@@ -757,7 +833,7 @@ export default function App() {
                         </optgroup>
                         <optgroup label="🏆 International Tournaments">
                           {COMPETITIONS.filter((c) => c.region === 'International').map((c) => {
-                            const count = fixtures.filter((f) => f.competition.id === c.id).length;
+                            const count = dateFilteredFixtures.filter((f) => f.competition.id === c.id).length;
                             return (
                               <option key={c.id} value={c.id}>
                                 {c.logo} {c.name} {count > 0 ? `(${count})` : ''}
@@ -768,7 +844,7 @@ export default function App() {
                       </>
                     ) : (
                       COMPETITIONS.filter((c) => c.region === selectedRegion).map((c) => {
-                        const count = fixtures.filter((f) => f.competition.id === c.id).length;
+                        const count = dateFilteredFixtures.filter((f) => f.competition.id === c.id).length;
                         return (
                           <option key={c.id} value={c.id}>
                             {c.logo} {c.name} {count > 0 ? `(${count})` : ''}

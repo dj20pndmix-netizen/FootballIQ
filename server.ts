@@ -691,6 +691,40 @@ Return ONLY a valid JSON object (no markdown fences if possible) with these fiel
     });
   });
 
+  // Automated Today's Matchday State & Date Resolver
+  app.get('/api/fixtures/today', syncRateLimiter, (req, res) => {
+    try {
+      const timezone = sanitizeText(String(req.query.timezone || 'Africa/Kampala'), 64);
+      let targetDate = sanitizeText(String(req.query.date || ''), 32);
+      if (!targetDate || !/^\d{4}-\d{2}-\d{2}$/.test(targetDate)) {
+        try {
+          targetDate = new Intl.DateTimeFormat('en-CA', {
+            timeZone: timezone,
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+          }).format(new Date());
+        } catch {
+          targetDate = new Date().toISOString().slice(0, 10);
+        }
+      }
+
+      res.json({
+        success: true,
+        data: {
+          dateStr: targetDate,
+          timezone,
+          dateLabel: serverStore.dateLabel || '15 November 2026',
+          lastAutoSyncAt: serverStore.lastAutoSyncAt,
+          fixtureUpdates: Object.values(serverStore.fixtureUpdates),
+          totalTracked: serverStore.trackedFixtures.length,
+        },
+      });
+    } catch (err: any) {
+      res.status(500).json({ success: false, error: err.message || 'Error resolving daily matchday' });
+    }
+  });
+
   app.post('/api/fixtures/sync', syncRateLimiter, async (req, res) => {
     try {
       if (req.body && typeof req.body !== 'object') {

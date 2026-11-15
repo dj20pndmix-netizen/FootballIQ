@@ -28,6 +28,7 @@ interface TopBarProps {
   user: UserProfile | null;
   onSignOut?: () => void;
   onOpenGoogleDriveSync?: () => void;
+  activeDateLabel?: string;
 }
 
 const VIEW_TITLES: Record<string, string> = {
@@ -51,6 +52,7 @@ export const TopBar: React.FC<TopBarProps> = ({
   user,
   onSignOut,
   onOpenGoogleDriveSync,
+  activeDateLabel,
 }) => {
   const [isAuthLoading, setIsAuthLoading] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -129,7 +131,7 @@ export const TopBar: React.FC<TopBarProps> = ({
           <span className="font-semibold text-emerald-400 truncate">{pageTitle}</span>
           <span className="text-slate-600 hidden md:inline">·</span>
           <span className="text-xs text-slate-400 font-mono whitespace-nowrap hidden md:inline">
-            {MATCHDAY_DATE_LABEL}
+            {activeDateLabel || MATCHDAY_DATE_LABEL}
           </span>
         </div>
       </div>

@@ -337,7 +337,7 @@ export const COMPETITIONS_BY_ID: Record<string, Competition> = COMPETITIONS.redu
   {} as Record<string, Competition>
 );
 
-const TEAMS: Record<string, Team> = {
+export const TEAMS: Record<string, Team> = {
   // Existing AFCON / UNL / EFL Teams (Preserved)
   uganda: {
     id: 'uganda',
@@ -3435,7 +3435,7 @@ const RAW_FIXTURES: Omit<Fixture, 'prediction'>[] = [
     competition: COMPETITIONS_BY_ID['wcq-sa'],
     homeTeam: TEAMS.argentina,
     awayTeam: TEAMS.brazil,
-    kickoffTimeUtc: '2026-11-15T23:30:00Z',
+    kickoffTimeUtc: '2026-11-15T19:30:00Z',
     status: 'NS',
     scores: { currentHome: 0, currentAway: 0 },
     venue: 'Estadio Monumental, Buenos Aires',
@@ -3500,7 +3500,7 @@ const RAW_FIXTURES: Omit<Fixture, 'prediction'>[] = [
     competition: COMPETITIONS_BY_ID.lib,
     homeTeam: TEAMS.flamengo,
     awayTeam: TEAMS.riverPlate,
-    kickoffTimeUtc: '2026-11-15T21:00:00Z',
+    kickoffTimeUtc: '2026-11-15T18:00:00Z',
     status: 'NS',
     scores: { currentHome: 0, currentAway: 0 },
     venue: 'Maracanã, Rio de Janeiro',
@@ -3576,7 +3576,7 @@ const RAW_FIXTURES: Omit<Fixture, 'prediction'>[] = [
     competition: COMPETITIONS_BY_ID.arg,
     homeTeam: TEAMS.bocaJuniors,
     awayTeam: TEAMS.racingClub,
-    kickoffTimeUtc: '2026-11-15T21:30:00Z',
+    kickoffTimeUtc: '2026-11-15T18:30:00Z',
     status: 'NS',
     scores: { currentHome: 0, currentAway: 0 },
     venue: 'La Bombonera, Buenos Aires',
@@ -3618,7 +3618,7 @@ const RAW_FIXTURES: Omit<Fixture, 'prediction'>[] = [
     competition: COMPETITIONS_BY_ID.mls,
     homeTeam: TEAMS.interMiami,
     awayTeam: TEAMS.laGalaxy,
-    kickoffTimeUtc: '2026-11-15T23:00:00Z',
+    kickoffTimeUtc: '2026-11-15T19:00:00Z',
     status: 'NS',
     scores: { currentHome: 0, currentAway: 0 },
     venue: 'Chase Stadium, Fort Lauderdale',
@@ -3682,7 +3682,7 @@ const RAW_FIXTURES: Omit<Fixture, 'prediction'>[] = [
     competition: COMPETITIONS_BY_ID.lmx,
     homeTeam: TEAMS.clubAmerica,
     awayTeam: TEAMS.chivas,
-    kickoffTimeUtc: '2026-11-15T21:05:00Z',
+    kickoffTimeUtc: '2026-11-15T18:05:00Z',
     status: 'NS',
     scores: { currentHome: 0, currentAway: 0 },
     venue: 'Estadio Ciudad de los Deportes, Mexico City',

@@ -22,6 +22,8 @@ import { getTeamBadge, normalizeTeamName } from '../src/services/teamBadgeServic
 import { TeamBadge } from '../src/components/TeamBadge.tsx';
 import { GoogleDriveSyncModal } from '../src/components/GoogleDriveSyncModal.tsx';
 import { InstallPwaBanner } from '../src/components/InstallPwaBanner.tsx';
+import { MatchdayDateNavigator } from '../src/components/MatchdayDateNavigator.tsx';
+import { getAutomatedMatchdayState } from '../src/services/matchdayService.ts';
 import {
   generateFixturesJsonBackup,
   generateMatchdayDossierMarkdown,
@@ -237,6 +239,13 @@ async function runTests() {
       'GET /api/fixtures/state retrieves persisted fixture update from disk store'
     );
 
+    const todayRes = await fetch(`${baseUrl}/api/fixtures/today?timezone=Africa/Kampala`);
+    const todayJson: any = await todayRes.json();
+    assert(
+      todayRes.status === 200 && todayJson.success === true && todayJson.data?.timezone === 'Africa/Kampala',
+      'GET /api/fixtures/today provides automated date-resolved matchday metadata'
+    );
+
     // 2g. Concurrent Read Performance Benchmark (20 parallel requests < 350ms)
     const perfStart = Date.now();
     const perfResponses = await Promise.all(
@@ -362,6 +371,20 @@ async function runTests() {
     })
   );
   assert(boundaryHtml.includes('Healthy Tree'), 'ErrorBoundary transparently renders healthy child trees');
+
+  const testMatchdayState = getAutomatedMatchdayState(fixtures, '2026-11-15', 'Africa/Kampala');
+  const navigatorHtml = renderToStaticMarkup(
+    React.createElement(MatchdayDateNavigator, {
+      matchdayState: testMatchdayState,
+      onChangeDate: noop,
+      onSimulateMidnightRollover: noop,
+      isLoading: false,
+    })
+  );
+  assert(
+    navigatorHtml.includes('Playing Strictly Today') && navigatorHtml.includes('Midnight in Kampala'),
+    'MatchdayDateNavigator renders strictly today badge, countdown, and controls without runtime errors'
+  );
 
   // -------------------------------------------------------------------------
   // 4. Authentication, Account Creation & Password Reset Component Tests
