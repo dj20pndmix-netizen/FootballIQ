@@ -33,6 +33,8 @@ for (const fix of baseline) {
     existing.homeTeamName = fix.homeTeam.name;
     existing.awayTeamName = fix.awayTeam.name;
     existing.competitionId = fix.competition.id;
+    existing.lastUpdatedUtc = new Date().toISOString();
+    existing.syncSource = 'Verified-Historical-Reconciliation';
     if (fix.status === 'FT') {
       existing.status = 'FT';
       existing.scores = {
@@ -41,12 +43,28 @@ for (const fix of baseline) {
         ...(typeof fix.scores.htHome === 'number' ? { htHome: fix.scores.htHome } : {}),
         ...(typeof fix.scores.htAway === 'number' ? { htAway: fix.scores.htAway } : {}),
       };
-      existing.lastUpdatedUtc = new Date().toISOString();
-      existing.syncSource = 'Verified-Historical-Reconciliation';
+      repairedCount++;
+    } else {
+      existing.status = fix.status as any;
+      existing.scores = {
+        currentHome: fix.scores.currentHome,
+        currentAway: fix.scores.currentAway,
+      };
+      // If it previously had a settlement from a different match, remove it
+      delete (existing as any).settlement;
       repairedCount++;
     }
   }
 }
+
+serverStore.trackedFixtures = baseline.map((f) => ({
+  fixtureId: f.id,
+  homeTeam: f.homeTeam.name,
+  awayTeam: f.awayTeam.name,
+  competitionId: f.competition.id,
+  competition: f.competition.name,
+  kickoffTimeUtc: f.kickoffTimeUtc,
+}));
 
 console.log(`Repaired/seeded ${repairedCount} fixture updates in server store.`);
 
