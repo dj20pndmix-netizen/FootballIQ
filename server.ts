@@ -29,6 +29,8 @@ import {
   validateScoutPayload,
   validateVeoPayload,
 } from './server/middleware.ts';
+import { optaDiscoveryService } from './src/services/opta/optaDiscoveryService.ts';
+import { optaIngestionService } from './src/services/opta/optaIngestionService.ts';
 
 dotenv.config();
 
@@ -869,6 +871,112 @@ Return ONLY a valid JSON object (no markdown fences if possible) with these fiel
           : `SportMonks connection error: ${err.message}`,
         latencyMs: Date.now() - start,
       });
+    }
+  });
+
+  // 3b. Server-side Opta SDAPI Status & Discovery Endpoints
+  app.get('/api/opta/status', syncRateLimiter, async (_req, res) => {
+    try {
+      const isConfigured = optaIngestionService.isLiveConfigured();
+      const catalog = optaDiscoveryService.discoverCompetitions();
+      const completeCount = catalog.filter((c) => c.coverageStatus === 'COMPLETE').length;
+      const partialCount = catalog.filter((c) => c.coverageStatus === 'PARTIAL').length;
+      const unavailableCount = catalog.filter((c) => c.coverageStatus === 'UNAVAILABLE').length;
+
+      res.json({
+        success: true,
+        data: {
+          liveConfigured: isConfigured,
+          provider: 'Opta / Stats Perform (SDAPI v1)',
+          outletKeyConfigured: Boolean(process.env.OPTA_OUTLET_KEY),
+          tokenBucketRateLimit: '10 req/s',
+          coverageMetrics: {
+            totalDiscoveredCompetitions: catalog.length,
+            complete: completeCount,
+            partial: partialCount,
+            unavailable: unavailableCount,
+            confederationsCovered: ['UEFA', 'CAF', 'CONMEBOL', 'CONCACAF', 'AFC', 'OFC', 'FIFA'],
+          },
+          supportedFeeds: [
+            'F01/F03 Fixtures & Match Details',
+            'F09 Starting Lineups & Formations (Pitch Coordinates)',
+            'F24 Granular In-Play Match Events',
+            'Advanced xG, PPDA, Field Tilt & Shot Coordinates',
+            'MA21 Opta Supercomputer Simulation Predictions',
+          ],
+        },
+      });
+    } catch (err: any) {
+      res.status(500).json({ success: false, error: err.message || 'Error checking Opta status' });
+    }
+  });
+
+  app.get('/api/opta/competitions', syncRateLimiter, (req, res) => {
+    try {
+      const confederation = (req.query.confederation as any) || 'ALL';
+      const gender = (req.query.gender as any) || 'ALL';
+      const tier = (req.query.tier as any) || 'ALL';
+      const status = (req.query.status as any) || 'ALL';
+      const searchQuery = sanitizeText(String(req.query.q || ''), 100);
+
+      const competitions = optaDiscoveryService.discoverCompetitions({
+        confederation,
+        gender,
+        tier,
+        status,
+        searchQuery,
+      });
+
+      res.json({
+        success: true,
+        count: competitions.length,
+        data: competitions,
+      });
+    } catch (err: any) {
+      res.status(500).json({ success: false, error: err.message || 'Error discovering Opta competitions' });
+    }
+  });
+
+  app.post('/api/opta/sync', syncRateLimiter, async (req, res) => {
+    try {
+      const outletKey = typeof req.body?.outletKey === 'string' ? sanitizeText(req.body.outletKey, 128) : undefined;
+      const syncResult = await optaDiscoveryService.synchronizeCoverage(outletKey);
+      res.json({
+        success: true,
+        data: syncResult,
+      });
+    } catch (err: any) {
+      res.status(500).json({ success: false, error: err.message || 'Error synchronizing Opta coverage' });
+    }
+  });
+
+  app.get('/api/opta/match/:id', syncRateLimiter, async (req, res) => {
+    try {
+      const fixtureId = sanitizeText(req.params.id, 128);
+      if (!fixtureId) {
+        return res.status(400).json({ success: false, error: 'Missing fixtureId' });
+      }
+
+      const [eventsRes, lineupRes, metricsRes, predRes] = await Promise.all([
+        optaIngestionService.ingestMatchEvents(fixtureId),
+        optaIngestionService.ingestLineups(fixtureId),
+        optaIngestionService.ingestAdvancedMetrics(fixtureId),
+        optaIngestionService.ingestOptaPredictions(fixtureId),
+      ]);
+
+      res.json({
+        success: true,
+        data: {
+          fixtureId,
+          events: eventsRes.data,
+          lineup: lineupRes.data,
+          metrics: metricsRes.data,
+          prediction: predRes.data,
+          source: eventsRes.source,
+        },
+      });
+    } catch (err: any) {
+      res.status(500).json({ success: false, error: err.message || 'Error ingesting Opta match feeds' });
     }
   });
 

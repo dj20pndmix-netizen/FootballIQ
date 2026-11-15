@@ -266,6 +266,19 @@ export const MatchDetailModal: React.FC<MatchDetailModalProps> = ({
             <BarChart2 className="w-3.5 h-3.5" />
             <span>Team Form & xG Radar</span>
           </button>
+
+          <button
+            onClick={() => {
+              setActiveTab('opta');
+              if (!optaData && !isOptaLoading) handleLoadOptaData();
+            }}
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+              activeTab === 'opta' ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-500/30' : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <Database className="w-3.5 h-3.5 text-indigo-400" />
+            <span>Opta Intelligence &amp; xG</span>
+          </button>
         </div>
 
         {/* Modal Body */}
@@ -650,6 +663,477 @@ export const MatchDetailModal: React.FC<MatchDetailModalProps> = ({
                   <div className="font-bold text-slate-100">{awayTeam.defenseRating}</div>
                 </div>
               </div>
+            </div>
+          )}
+
+          {/* TAB 5: OPTA WORLDWIDE INTELLIGENCE, SHOT MAP & DUAL MODEL */}
+          {activeTab === 'opta' && (
+            <div className="space-y-6 text-xs">
+              {isOptaLoading ? (
+                <div className="py-20 text-center space-y-3">
+                  <Activity className="w-8 h-8 text-indigo-400 animate-spin mx-auto" />
+                  <p className="text-slate-300 font-semibold text-sm">
+                    Ingesting Opta SDAPI match feeds &amp; computing dual-model projections...
+                  </p>
+                  <p className="text-slate-500 text-xs">
+                    Connecting to Stats Perform F24 events, formations, and MA21 supercomputer engine
+                  </p>
+                </div>
+              ) : optaData ? (
+                <>
+                  {/* Data Provenance & Strict Model Separation Notice */}
+                  <div className="p-4 rounded-2xl bg-indigo-950/40 border border-indigo-700/50 space-y-2">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <span className="px-2 py-0.5 rounded-md bg-indigo-900 border border-indigo-600/50 text-[10px] font-mono font-bold text-indigo-200">
+                          OPTA SDAPI v1 / STATS PERFORM
+                        </span>
+                        <span className="text-[10px] text-indigo-300">
+                          Outlet Auth Verified · 10 req/sec Token Bucket
+                        </span>
+                      </div>
+                      <span className="text-[10px] text-slate-400 font-mono">
+                        Calculated: {new Date(optaData.predictionSuite.provenance.calculatedAt).toLocaleTimeString()}
+                      </span>
+                    </div>
+
+                    <p className="text-slate-300 text-xs leading-relaxed">
+                      <strong className="text-indigo-300">Dual-Model Provenance Policy:</strong> Official Opta Supercomputer predictions (MA21 Monte Carlo 10,000 runs) are strictly distinguished from FootballIQ in-house Dixon-Coles Poisson calculations calibrated with Opta xG. Neither model represents a guarantee of future outcomes.
+                    </p>
+                  </div>
+
+                  {/* Dual-Model Win Probability Comparison */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Model A: Opta Supercomputer MA21 */}
+                    <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-3">
+                      <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+                        <div className="flex items-center gap-2">
+                          <Zap className="w-4 h-4 text-amber-400" />
+                          <h5 className="font-bold text-slate-100 text-xs">Opta Supercomputer (MA21)</h5>
+                        </div>
+                        <span className="text-[10px] font-mono text-amber-400 bg-amber-950/60 border border-amber-800/80 px-2 py-0.5 rounded">
+                          Official Opta
+                        </span>
+                      </div>
+
+                      {optaData.predictionSuite.officialOpta ? (
+                        <>
+                          <div className="grid grid-cols-3 gap-2 text-center">
+                            <div className="p-2 rounded-xl bg-slate-900 border border-slate-800">
+                              <span className="text-[10px] text-slate-400 block">Home Win</span>
+                              <span className="text-sm font-extrabold text-amber-300 font-mono">
+                                {formatProb(optaData.predictionSuite.officialOpta.market1X2.homeWin)}
+                              </span>
+                            </div>
+                            <div className="p-2 rounded-xl bg-slate-900 border border-slate-800">
+                              <span className="text-[10px] text-slate-400 block">Draw</span>
+                              <span className="text-sm font-extrabold text-slate-300 font-mono">
+                                {formatProb(optaData.predictionSuite.officialOpta.market1X2.draw)}
+                              </span>
+                            </div>
+                            <div className="p-2 rounded-xl bg-slate-900 border border-slate-800">
+                              <span className="text-[10px] text-slate-400 block">Away Win</span>
+                              <span className="text-sm font-extrabold text-amber-300 font-mono">
+                                {formatProb(optaData.predictionSuite.officialOpta.market1X2.awayWin)}
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1">
+                            <span>Power Ranking:</span>
+                            <span className="font-mono text-slate-200">
+                              {homeTeam.name}: {optaData.predictionSuite.officialOpta.powerRankings.home.toFixed(1)} · {awayTeam.name}: {optaData.predictionSuite.officialOpta.powerRankings.away.toFixed(1)}
+                            </span>
+                          </div>
+                          <div className="text-[10px] text-slate-500 font-mono text-right">
+                            {optaData.predictionSuite.officialOpta.simulationRuns.toLocaleString()} Monte Carlo match simulations
+                          </div>
+                        </>
+                      ) : (
+                        <div className="p-3 text-center text-slate-500 text-xs">
+                          Opta MA21 feed not published for this tier fixture.
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Model B: FootballIQ Dixon-Coles on Opta xG */}
+                    <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-3">
+                      <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+                        <div className="flex items-center gap-2">
+                          <Activity className="w-4 h-4 text-emerald-400" />
+                          <h5 className="font-bold text-slate-100 text-xs">FootballIQ In-House Model</h5>
+                        </div>
+                        <span className="text-[10px] font-mono text-emerald-400 bg-emerald-950/60 border border-emerald-800/80 px-2 py-0.5 rounded">
+                          Opta-Calibrated
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-2 text-center">
+                        <div className="p-2 rounded-xl bg-slate-900 border border-slate-800">
+                          <span className="text-[10px] text-slate-400 block">Home Win</span>
+                          <span className="text-sm font-extrabold text-emerald-400 font-mono">
+                            {formatProb(optaData.predictionSuite.inHouse.market1X2.homeWin)}
+                          </span>
+                        </div>
+                        <div className="p-2 rounded-xl bg-slate-900 border border-slate-800">
+                          <span className="text-[10px] text-slate-400 block">Draw</span>
+                          <span className="text-sm font-extrabold text-slate-300 font-mono">
+                            {formatProb(optaData.predictionSuite.inHouse.market1X2.draw)}
+                          </span>
+                        </div>
+                        <div className="p-2 rounded-xl bg-slate-900 border border-slate-800">
+                          <span className="text-[10px] text-slate-400 block">Away Win</span>
+                          <span className="text-sm font-extrabold text-emerald-400 font-mono">
+                            {formatProb(optaData.predictionSuite.inHouse.market1X2.awayWin)}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1">
+                        <span>Calibrated Intensities:</span>
+                        <span className="font-mono text-slate-200">
+                          Home λ={optaData.predictionSuite.inHouse.homeLambda.toFixed(2)} · Away λ={optaData.predictionSuite.inHouse.awayLambda.toFixed(2)}
+                        </span>
+                      </div>
+                      <div className="text-[10px] text-slate-500 font-mono text-right">
+                        Bivariate Poisson with Dixon-Coles low-score dependency adjustment
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Advanced Opta Metrics (xG, Field Tilt, PPDA, Deep Completions) */}
+                  <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-3">
+                    <h5 className="font-bold text-slate-200 text-xs flex items-center gap-2">
+                      <Layers className="w-4 h-4 text-indigo-400" />
+                      <span>Opta Advanced Match Dynamics</span>
+                    </h5>
+
+                    <div className="grid grid-cols-4 gap-2 text-center">
+                      <div className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800">
+                        <span className="text-[10px] text-slate-400 block">Expected Goals (xG)</span>
+                        <div className="font-mono font-bold text-slate-100 text-sm mt-0.5">
+                          <span className="text-emerald-400">{optaData.homeStats.xg.toFixed(2)}</span>
+                          <span className="text-slate-500 mx-1.5">:</span>
+                          <span className="text-emerald-400">{optaData.awayStats.xg.toFixed(2)}</span>
+                        </div>
+                      </div>
+
+                      <div className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800">
+                        <span className="text-[10px] text-slate-400 block">Field Tilt %</span>
+                        <div className="font-mono font-bold text-slate-100 text-sm mt-0.5">
+                          <span className="text-cyan-400">{optaData.homeStats.fieldTiltPct}%</span>
+                          <span className="text-slate-500 mx-1.5">:</span>
+                          <span className="text-cyan-400">{optaData.awayStats.fieldTiltPct}%</span>
+                        </div>
+                      </div>
+
+                      <div className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800">
+                        <span className="text-[10px] text-slate-400 block">PPDA (Pressing)</span>
+                        <div className="font-mono font-bold text-slate-100 text-sm mt-0.5">
+                          <span className="text-amber-400">{optaData.homeStats.ppda.toFixed(1)}</span>
+                          <span className="text-slate-500 mx-1.5">:</span>
+                          <span className="text-amber-400">{optaData.awayStats.ppda.toFixed(1)}</span>
+                        </div>
+                      </div>
+
+                      <div className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800">
+                        <span className="text-[10px] text-slate-400 block">Deep Completions</span>
+                        <div className="font-mono font-bold text-slate-100 text-sm mt-0.5">
+                          <span className="text-indigo-400">{optaData.homeStats.deepCompletions}</span>
+                          <span className="text-slate-500 mx-1.5">:</span>
+                          <span className="text-indigo-400">{optaData.awayStats.deepCompletions}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Opta F24 2D Tactical Shot Map */}
+                  <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-3">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <Crosshair className="w-4 h-4 text-emerald-400" />
+                        <h5 className="font-bold text-slate-200 text-xs">Opta F24 Spatial Shot Map &amp; xG Values</h5>
+                      </div>
+                      <div className="flex items-center gap-3 text-[10px] font-mono text-slate-400">
+                        <span className="flex items-center gap-1">
+                          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block" /> Goal
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <span className="w-2.5 h-2.5 rounded-full bg-sky-500 inline-block" /> Saved
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <span className="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block" /> Blocked
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <span className="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block" /> Missed
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Pitch Diagram */}
+                    <div className="relative w-full h-64 rounded-xl bg-gradient-to-b from-emerald-950/60 to-emerald-900/40 border border-emerald-800/60 overflow-hidden shadow-inner flex items-center justify-center">
+                      {/* Pitch markings */}
+                      <div className="absolute inset-2 border border-emerald-500/30 rounded-lg pointer-events-none" />
+                      <div className="absolute inset-y-2 left-1/2 -translate-x-1/2 border-l border-emerald-500/30 pointer-events-none" />
+                      <div className="absolute w-24 h-24 rounded-full border border-emerald-500/30 pointer-events-none" />
+                      {/* Penalty box home */}
+                      <div className="absolute left-2 top-1/4 bottom-1/4 w-16 border-r border-t border-b border-emerald-500/30 pointer-events-none" />
+                      {/* Penalty box away */}
+                      <div className="absolute right-2 top-1/4 bottom-1/4 w-16 border-l border-t border-b border-emerald-500/30 pointer-events-none" />
+
+                      {/* Plotted Shots */}
+                      {optaData.xgShots.map((shot) => {
+                        const diameter = Math.max(16, Math.min(36, Math.round(shot.xgValue * 48)));
+                        const bgClass =
+                          shot.outcome === 'Goal'
+                            ? 'bg-emerald-500 ring-2 ring-emerald-300'
+                            : shot.outcome === 'Saved'
+                            ? 'bg-sky-500 ring-1 ring-sky-300'
+                            : shot.outcome === 'Blocked'
+                            ? 'bg-amber-500'
+                            : 'bg-rose-500';
+
+                        return (
+                          <div
+                            key={shot.shotId}
+                            style={{
+                              left: `${shot.pitchX}%`,
+                              top: `${shot.pitchY}%`,
+                              width: `${diameter}px`,
+                              height: `${diameter}px`,
+                              transform: 'translate(-50%, -50%)',
+                            }}
+                            title={`Min ${shot.minute}' | xG: ${shot.xgValue.toFixed(2)} | Outcome: ${shot.outcome} | ${shot.bodyPart || 'Shot'} (${shot.shotType || 'OpenPlay'})`}
+                            className={`absolute rounded-full flex items-center justify-center text-[9px] font-black text-slate-950 font-mono cursor-pointer transition-transform hover:scale-125 shadow-md ${bgClass}`}
+                          >
+                            {shot.minute}'
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Opta Starting XI Tactical Formations */}
+                  <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-4">
+                    <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+                      <div className="flex items-center gap-2">
+                        <Users className="w-4 h-4 text-indigo-400" />
+                        <h5 className="font-bold text-slate-200 text-xs">Opta Confirmed Lineups &amp; Tactical Formations</h5>
+                      </div>
+                      <div className="text-[11px] font-mono text-slate-400">
+                        {homeTeam.name} ({optaData.lineup.homeTeamFormation}) vs {awayTeam.name} ({optaData.lineup.awayTeamFormation})
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Home XI */}
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between text-[11px] font-bold text-emerald-400">
+                          <span>{homeTeam.name} Starting XI</span>
+                          <span className="font-mono text-xs">{optaData.lineup.homeTeamFormation}</span>
+                        </div>
+                        <div className="space-y-1">
+                          {optaData.lineup.homeStartingXI.map((p) => (
+                            <div
+                              key={p.optaPlayerId}
+                              className="flex items-center justify-between p-1.5 rounded-lg bg-slate-900 border border-slate-800/80 text-[11px]"
+                            >
+                              <div className="flex items-center gap-2">
+                                <span className="w-5 text-right font-mono font-bold text-slate-400">
+                                  #{p.shirtNumber}
+                                </span>
+                                <span className="font-semibold text-slate-200">{p.name}</span>
+                              </div>
+                              <span className="font-mono text-[10px] text-slate-400 uppercase">
+                                {p.formationSlot || p.position}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Away XI */}
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between text-[11px] font-bold text-sky-400">
+                          <span>{awayTeam.name} Starting XI</span>
+                          <span className="font-mono text-xs">{optaData.lineup.awayTeamFormation}</span>
+                        </div>
+                        <div className="space-y-1">
+                          {optaData.lineup.awayStartingXI.map((p) => (
+                            <div
+                              key={p.optaPlayerId}
+                              className="flex items-center justify-between p-1.5 rounded-lg bg-slate-900 border border-slate-800/80 text-[11px]"
+                            >
+                              <div className="flex items-center gap-2">
+                                <span className="w-5 text-right font-mono font-bold text-slate-400">
+                                  #{p.shirtNumber}
+                                </span>
+                                <span className="font-semibold text-slate-200">{p.name}</span>
+                              </div>
+                              <span className="font-mono text-[10px] text-slate-400 uppercase">
+                                {p.formationSlot || p.position}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                                <span className="font-semibold text-slate-200">{p.name}</span>
+                              </div>
+                              <span className="font-mono text-[10px] text-slate-400 uppercase">
+                                {p.position}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* All 12 Prediction Markets Suite (Opta Calibrated) */}
+                  <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-4">
+                    <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+                      <div className="flex items-center gap-2">
+                        <TrendingUp className="w-4 h-4 text-emerald-400" />
+                        <h5 className="font-bold text-slate-200 text-xs">
+                          All 12 Calibrated Prediction Markets
+                        </h5>
+                      </div>
+                      <span className="text-[10px] font-mono text-slate-400">
+                        Poisson / Dixon-Coles on Opta xG
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {/* 1. 1X2 */}
+                      <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase block">1. 1X2 Full-Time</span>
+                        <div className="flex justify-between text-xs font-mono">
+                          <span>1: <strong className="text-emerald-400">{formatProb(optaData.predictionSuite.inHouse.market1X2.homeWin)}</strong></span>
+                          <span>X: <strong className="text-slate-300">{formatProb(optaData.predictionSuite.inHouse.market1X2.draw)}</strong></span>
+                          <span>2: <strong className="text-emerald-400">{formatProb(optaData.predictionSuite.inHouse.market1X2.awayWin)}</strong></span>
+                        </div>
+                      </div>
+
+                      {/* 2. Double Chance */}
+                      <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase block">2. Double Chance</span>
+                        <div className="flex justify-between text-xs font-mono">
+                          <span>1X: <strong className="text-emerald-400">{formatProb(optaData.predictionSuite.inHouse.marketDoubleChance.oneX)}</strong></span>
+                          <span>12: <strong className="text-slate-300">{formatProb(optaData.predictionSuite.inHouse.marketDoubleChance.oneTwo)}</strong></span>
+                          <span>X2: <strong className="text-emerald-400">{formatProb(optaData.predictionSuite.inHouse.marketDoubleChance.xTwo)}</strong></span>
+                        </div>
+                      </div>
+
+                      {/* 3. BTTS */}
+                      <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase block">3. Both Teams to Score</span>
+                        <div className="flex justify-between text-xs font-mono">
+                          <span>Yes: <strong className="text-emerald-400">{formatProb(optaData.predictionSuite.inHouse.marketBTTS.yes)}</strong></span>
+                          <span>No: <strong className="text-slate-300">{formatProb(optaData.predictionSuite.inHouse.marketBTTS.no)}</strong></span>
+                        </div>
+                      </div>
+
+                      {/* 4. Over/Under 0.5 */}
+                      <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase block">4. Over/Under 0.5</span>
+                        <div className="flex justify-between text-xs font-mono">
+                          <span>Over: <strong className="text-emerald-400">{formatProb(optaData.predictionSuite.inHouse.marketOverUnder05.over)}</strong></span>
+                          <span>Under: <strong className="text-slate-300">{formatProb(optaData.predictionSuite.inHouse.marketOverUnder05.under)}</strong></span>
+                        </div>
+                      </div>
+
+                      {/* 5. Over/Under 1.5 */}
+                      <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase block">5. Over/Under 1.5</span>
+                        <div className="flex justify-between text-xs font-mono">
+                          <span>Over: <strong className="text-emerald-400">{formatProb(optaData.predictionSuite.inHouse.marketOverUnder15.over)}</strong></span>
+                          <span>Under: <strong className="text-slate-300">{formatProb(optaData.predictionSuite.inHouse.marketOverUnder15.under)}</strong></span>
+                        </div>
+                      </div>
+
+                      {/* 6. Over/Under 2.5 */}
+                      <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase block">6. Over/Under 2.5</span>
+                        <div className="flex justify-between text-xs font-mono">
+                          <span>Over: <strong className="text-emerald-400">{formatProb(optaData.predictionSuite.inHouse.marketOverUnder25.over)}</strong></span>
+                          <span>Under: <strong className="text-slate-300">{formatProb(optaData.predictionSuite.inHouse.marketOverUnder25.under)}</strong></span>
+                        </div>
+                      </div>
+
+                      {/* 7. Over/Under 3.5 */}
+                      <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase block">7. Over/Under 3.5</span>
+                        <div className="flex justify-between text-xs font-mono">
+                          <span>Over: <strong className="text-emerald-400">{formatProb(optaData.predictionSuite.inHouse.marketOverUnder35.over)}</strong></span>
+                          <span>Under: <strong className="text-slate-300">{formatProb(optaData.predictionSuite.inHouse.marketOverUnder35.under)}</strong></span>
+                        </div>
+                      </div>
+
+                      {/* 8. First Half Goals */}
+                      <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase block">8. First Half Goals</span>
+                        <div className="flex justify-between text-xs font-mono">
+                          <span>O0.5: <strong className="text-emerald-400">{formatProb(optaData.predictionSuite.inHouse.marketHalfGoals.firstHalf.over05)}</strong></span>
+                          <span>U0.5: <strong className="text-slate-300">{formatProb(optaData.predictionSuite.inHouse.marketHalfGoals.firstHalf.under05)}</strong></span>
+                          <span>O1.5: <strong className="text-amber-400">{formatProb(optaData.predictionSuite.inHouse.marketHalfGoals.firstHalf.over15)}</strong></span>
+                        </div>
+                      </div>
+
+                      {/* 9. Second Half Goals */}
+                      <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase block">9. Second Half Goals</span>
+                        <div className="flex justify-between text-xs font-mono">
+                          <span>O0.5: <strong className="text-emerald-400">{formatProb(optaData.predictionSuite.inHouse.marketHalfGoals.secondHalf.over05)}</strong></span>
+                          <span>U0.5: <strong className="text-slate-300">{formatProb(optaData.predictionSuite.inHouse.marketHalfGoals.secondHalf.under05)}</strong></span>
+                          <span>O1.5: <strong className="text-amber-400">{formatProb(optaData.predictionSuite.inHouse.marketHalfGoals.secondHalf.over15)}</strong></span>
+                        </div>
+                      </div>
+
+                      {/* 10. Clean Sheets */}
+                      <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase block">10. Clean Sheets</span>
+                        <div className="flex justify-between text-xs font-mono">
+                          <span>Home CS: <strong className="text-emerald-400">{formatProb(optaData.predictionSuite.inHouse.marketCleanSheet.homeCleanSheet)}</strong></span>
+                          <span>Away CS: <strong className="text-sky-400">{formatProb(optaData.predictionSuite.inHouse.marketCleanSheet.awayCleanSheet)}</strong></span>
+                        </div>
+                      </div>
+
+                      {/* 11. Team to Score */}
+                      <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase block">11. Team to Score</span>
+                        <div className="flex justify-between text-xs font-mono">
+                          <span>Home: <strong className="text-emerald-400">{formatProb(optaData.predictionSuite.inHouse.marketTeamToScore.homeToScore)}</strong></span>
+                          <span>Away: <strong className="text-sky-400">{formatProb(optaData.predictionSuite.inHouse.marketTeamToScore.awayToScore)}</strong></span>
+                        </div>
+                      </div>
+
+                      {/* 12. HT/FT Top Pick */}
+                      <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase block">12. HT / FT Projection</span>
+                        <div className="flex justify-between text-xs font-mono">
+                          <span>Pick: <strong className="text-emerald-400">{optaData.predictionSuite.inHouse.marketHtFt.predictedOutcome}</strong></span>
+                          <span>Top Prob: <strong className="text-emerald-400">{formatProb(optaData.predictionSuite.inHouse.marketHtFt.highestProbability)}</strong></span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="p-8 text-center bg-slate-950 border border-slate-800 rounded-2xl space-y-3">
+                  <Database className="w-8 h-8 text-slate-500 mx-auto" />
+                  <h5 className="font-bold text-slate-200 text-sm">Load Opta SDAPI Feeds</h5>
+                  <p className="text-xs text-slate-400 max-w-sm mx-auto">
+                    Retrieve authorized Opta F24 events, starting XI formations, and official Stats Perform supercomputer calculations.
+                  </p>
+                  <button
+                    onClick={handleLoadOptaData}
+                    className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs transition-colors"
+                  >
+                    Ingest Opta Data
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>

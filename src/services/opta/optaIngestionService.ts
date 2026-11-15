@@ -68,7 +68,7 @@ const SAMPLE_F24_MATCH_EVENTS: OptaMatchEvent[] = [
     fixtureId: 'opta:match:m101',
     period: '1H',
     minute: 13,
-    second: 02,
+    second: 2,
     teamId: 'opta:team:t3',
     playerId: 'opta:player:p9944',
     playerName: 'Kai Havertz',
