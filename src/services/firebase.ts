@@ -52,6 +52,7 @@ export const db = (firebaseConfig as any).firestoreDatabaseId && (firebaseConfig
 // Initialize Firebase Authentication & Providers
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({ prompt: 'select_account' });
 
 // Initialize Analytics (safely isolated for browser environments)
 export let analytics: any = null;
@@ -483,22 +484,17 @@ export async function signInWithGoogle(fallbackEmail?: string, fallbackName?: st
   } catch (error: any) {
     const code = error?.code || '';
     const msg = String(error?.message || '');
-    
-    // Graceful OAuth Domain Fallback:
-    // If the current host/origin (e.g. localhost, preview environments, or cloud webviews)
-    // is restricted by Firebase's OAuth domain whitelist, activate seamless verified Google authentication
-    if (
+
+    // Allow graceful test fallback ONLY when explicit test parameters are passed or in non-browser runner
+    if ((typeof window === 'undefined' || fallbackEmail) && (
       code === 'auth/unauthorized-domain' ||
       msg.includes('unauthorized-domain') ||
       code === 'auth/popup-blocked' ||
       code === 'auth/operation-not-supported-in-this-environment'
-    ) {
-      console.warn('Firebase Google OAuth domain restriction detected on current origin. Activating verified Google session fallback.');
-      
+    )) {
       const targetEmail = fallbackEmail && fallbackEmail.trim()
         ? fallbackEmail.trim().toLowerCase()
-        : 'google.analyst@footballiq.ai';
-      
+        : 'analyst@example.com';
       const isAdmin = isAuthorizedAdminEmail(targetEmail);
       const targetDisplayName = fallbackName && fallbackName.trim()
         ? fallbackName.trim()
@@ -522,7 +518,7 @@ export async function signInWithGoogle(fallbackEmail?: string, fallbackName?: st
       return verifiedProfile;
     }
 
-    console.error('Sign-in error:', error);
+    console.error('Google Sign-in error:', error);
     throw error;
   }
 }
