@@ -55,7 +55,8 @@ export const FixtureCard: React.FC<FixtureCardProps> = ({
     switch (status) {
       case 'LIVE':
         return (
-          <span className="text-rose-400 font-bold font-mono tabular-nums">
+          <span className="text-rose-400 font-bold font-mono tabular-nums flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
             LIVE {scores.minute}'
           </span>
         );
@@ -63,6 +64,10 @@ export const FixtureCard: React.FC<FixtureCardProps> = ({
         return <span className="text-amber-400 font-bold font-mono">HT</span>;
       case 'FT':
         return <span className="text-slate-300 font-semibold font-mono">FT</span>;
+      case 'POSTP':
+        return <span className="text-amber-400 font-bold font-mono">POSTPONED</span>;
+      case 'CANC':
+        return <span className="text-rose-400 font-bold font-mono">CANCELLED</span>;
       default:
         return (
           <span className="text-slate-300 font-mono tabular-nums">
