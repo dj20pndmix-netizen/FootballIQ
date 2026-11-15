@@ -31,6 +31,7 @@ import {
 } from './server/middleware.ts';
 import { optaDiscoveryService } from './src/services/opta/optaDiscoveryService.ts';
 import { optaIngestionService } from './src/services/opta/optaIngestionService.ts';
+import { runServerAutoSettlement } from './server/settlementEngine.ts';
 
 dotenv.config();
 
@@ -350,7 +351,11 @@ export async function executeUnifiedSync(params: {
       }
       const koMs = Date.parse(t.kickoffTimeUtc);
       if (Number.isNaN(koMs)) return false;
-      return nowMs >= koMs - 15 * 60_000 && nowMs <= koMs + 4 * 3600_000;
+      // Active window: upcoming within 15m or in progress up to 4h
+      const inLiveWindow = nowMs >= koMs - 15 * 60_000 && nowMs <= koMs + 4 * 3600_000;
+      // Overdue window: match kicked off > 105m ago and is still not marked FT/POSTP/CANC
+      const isOverdue = nowMs >= koMs + 105 * 60_000;
+      return inLiveWindow || isOverdue;
     });
 
     const cooldownElapsed = nowMs - serverStore.lastExternalSearchEpochMs >= EXTERNAL_SEARCH_COOLDOWN_MS;
@@ -478,6 +483,16 @@ Return ONLY a valid JSON object with:
       }
     } else if (!hasActiveWindowMatch && !params.forceExternal) {
       summaryNotes.push('Store reconciled; no unresolved matches are currently in live kickoff window.');
+    }
+
+    // Run automated settlement audit on all completed matches
+    const autoSettlement = runServerAutoSettlement();
+    if (autoSettlement.settledCount > 0 || autoSettlement.voidedCount > 0) {
+      summaryNotes.push(
+        `Auto-Settlement Engine graded ${autoSettlement.settledCount} completed match(es)${
+          autoSettlement.voidedCount > 0 ? `, voided ${autoSettlement.voidedCount}` : ''
+        }.`
+      );
     }
 
     const completedAt = new Date().toISOString();
