@@ -60,6 +60,7 @@ import {
   getFixtureLocalDate,
   formatLocalDateLabel,
 } from './utils/timezone';
+import { resolveMatchLifecycle } from './services/fixtureClassifier';
 import { onAuthStateChanged } from 'firebase/auth';
 import {
   Search,
@@ -383,18 +384,31 @@ export default function App() {
     setActiveMatchdayDate(newDateStr);
     setIsGeneratingDailySlate(true);
     try {
-      if (newDateStr === '2026-11-15') {
-        const baseline = getInitialFixtures();
-        const cachedUpdates = loadFixtureUpdatesFromCache();
-        const merged = mergeFixtureUpdates(baseline, cachedUpdates);
-        setFixtures(merged);
-        fixturesRef.current = merged;
+      const baseline = getInitialFixtures();
+      const cachedUpdates = loadFixtureUpdatesFromCache();
+      const mergedBaseline = mergeFixtureUpdates(baseline, cachedUpdates);
+
+      // Check if newDateStr is present in baseline
+      const hasDateInBaseline = mergedBaseline.some(
+        (f) => getFixtureLocalDate(f.kickoffTimeUtc, selectedTimezone) === newDateStr
+      );
+
+      let fullArchive: Fixture[];
+      if (hasDateInBaseline) {
+        fullArchive = mergedBaseline;
       } else {
         const generatedSlate = generateMatchdaySlateForDate(newDateStr, selectedTimezone);
-        setFixtures(generatedSlate);
-        fixturesRef.current = generatedSlate;
         saveFixtureUpdatesToCache(generatedSlate);
+        const existingIds = new Set(mergedBaseline.map((f) => f.id));
+        fullArchive = [
+          ...mergedBaseline,
+          ...generatedSlate.filter((f) => !existingIds.has(f.id)),
+        ];
       }
+
+      setFixtures(fullArchive);
+      fixturesRef.current = fullArchive;
+
       setRolloverNotice(
         `Automated Matchday Slate Active: Showing matches strictly for ${formatLocalDateLabel(newDateStr)} (${selectedTimezone}).`
       );
@@ -466,6 +480,31 @@ export default function App() {
   const liveMatches = dateFilteredFixtures.filter((f) => f.status === 'LIVE');
   const upcomingMatches = dateFilteredFixtures.filter((f) => f.status === 'NS');
   const completedMatches = dateFilteredFixtures.filter((f) => f.status === 'FT');
+
+  const nowTime = new Date();
+  const classifiedFixtures = filteredFixtures.map((f) => ({
+    fixture: f,
+    lifecycle: resolveMatchLifecycle(f, nowTime, selectedTimezone),
+  }));
+
+  const liveGroup = classifiedFixtures.filter(
+    (item) => item.lifecycle.category === 'LIVE' || item.lifecycle.category === 'SUSPENDED'
+  );
+  const upcomingGroup = classifiedFixtures.filter(
+    (item) => item.lifecycle.category === 'UPCOMING'
+  );
+  const completedGroup = classifiedFixtures.filter(
+    (item) => item.lifecycle.category === 'COMPLETED'
+  );
+  const postponedGroup = classifiedFixtures.filter(
+    (item) =>
+      item.lifecycle.category === 'POSTPONED' ||
+      item.lifecycle.category === 'CANCELLED' ||
+      item.lifecycle.category === 'ABANDONED'
+  );
+  const awaitingGroup = classifiedFixtures.filter(
+    (item) => item.lifecycle.category === 'AWAITING_CONFIRMATION'
+  );
 
   const matchdayState = getAutomatedMatchdayState(
     fixtures,
