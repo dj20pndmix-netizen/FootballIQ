@@ -58,6 +58,7 @@ import {
   X,
   Clock,
   Flame,
+  Calendar,
 } from 'lucide-react';
 
 const SIDEBAR_STORAGE_KEY = 'footballiq_sidebar_collapsed';
@@ -596,6 +597,44 @@ export default function App() {
                 compact
                 onNavigateToFullCalibration={() => setActiveTab('calibration')}
               />
+
+              {/* Matchday Slate Active Date & Verified Fixtures Banner */}
+              <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 rounded-2xl bg-slate-900/90 border border-slate-800 shadow-sm backdrop-blur-sm">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                    <Calendar className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold text-white tracking-wide">
+                        Matchday Slate: Sunday, 15 November 2026
+                      </span>
+                      <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-mono font-semibold">
+                        Upcoming Matches Active
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-400">
+                      Real-time Poisson &amp; Dixon-Coles probabilities for today's upcoming fixtures across 30 world leagues.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 text-xs font-mono text-slate-400">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    <span>Upcoming: <strong className="text-emerald-300">{upcomingMatches.length}</strong></span>
+                  </div>
+                  <span>•</span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-amber-400" />
+                    <span>Live: <strong className="text-amber-300">{liveMatches.length}</strong></span>
+                  </div>
+                  <span>•</span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-slate-500" />
+                    <span>Settled: <strong className="text-slate-300">{completedMatches.length}</strong></span>
+                  </div>
+                </div>
+              </div>
 
               {/* Compact Unified Filter & Market Toolbar */}
               <div className="rounded-2xl bg-slate-900 border border-slate-800 p-4 space-y-3">

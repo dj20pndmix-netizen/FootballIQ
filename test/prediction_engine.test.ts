@@ -164,7 +164,7 @@ const syncedWithoutHt = mergeFixtureUpdates([upcomingSample], [
     kickoffTimeUtc: upcomingSample.kickoffTimeUtc,
     status: 'FT',
     scores: { currentHome: 2, currentAway: 1 },
-    lastUpdatedUtc: '2026-11-14T22:30:00Z',
+    lastUpdatedUtc: '2026-11-15T22:30:00Z',
     syncSource: 'Search-Verified',
   },
 ]);
@@ -186,7 +186,7 @@ const syncedWithHt = mergeFixtureUpdates(syncedWithoutHt, [
     kickoffTimeUtc: upcomingSample.kickoffTimeUtc,
     status: 'FT',
     scores: { currentHome: 2, currentAway: 1, htHome: 1, htAway: 0 },
-    lastUpdatedUtc: '2026-11-14T22:35:00Z',
+    lastUpdatedUtc: '2026-11-15T22:35:00Z',
     syncSource: 'SportMonks-v3',
   },
 ]);

@@ -100,7 +100,7 @@ export function loadServerStore(): PersistedServerStore {
         syncJobs: Array.isArray(parsed.syncJobs) ? parsed.syncJobs : [],
         lastAutoSyncAt: parsed.lastAutoSyncAt || null,
         lastExternalSearchEpochMs: Number(parsed.lastExternalSearchEpochMs || 0),
-        dateLabel: parsed.dateLabel || '14 November 2026',
+        dateLabel: parsed.dateLabel || '15 November 2026',
       };
     }
   } catch (err) {
@@ -112,7 +112,7 @@ export function loadServerStore(): PersistedServerStore {
     syncJobs: [],
     lastAutoSyncAt: null,
     lastExternalSearchEpochMs: 0,
-    dateLabel: '14 November 2026',
+    dateLabel: '15 November 2026',
   };
 }
 

@@ -698,7 +698,7 @@ Return ONLY a valid JSON object (no markdown fences if possible) with these fiel
       }
       const {
         trigger = 'manual',
-        dateLabel = '14 November 2026',
+        dateLabel = '15 November 2026',
         forceExternal = false,
         fixtures = [],
       } = req.body || {};
@@ -712,7 +712,7 @@ Return ONLY a valid JSON object (no markdown fences if possible) with these fiel
 
       const result = await executeUnifiedSync({
         trigger: safeTrigger,
-        dateLabel: sanitizeText(dateLabel, 64) || '14 November 2026',
+        dateLabel: sanitizeText(dateLabel, 64) || '15 November 2026',
         forceExternal: Boolean(forceExternal),
         incomingFixtures: Array.isArray(fixtures) ? fixtures : [],
       });
@@ -841,7 +841,7 @@ Return ONLY a valid JSON object (no markdown fences if possible) with these fiel
   // 4. Direct Search-Grounded Fixture Sync Endpoint
   app.post('/api/gemini/sync-fixtures', aiRateLimiter, async (req, res) => {
     try {
-      const dateLabel = sanitizeText(req.body?.dateLabel, 64) || '14 November 2026';
+      const dateLabel = sanitizeText(req.body?.dateLabel, 64) || '15 November 2026';
       const fixtures = Array.isArray(req.body?.fixtures) ? req.body.fixtures.slice(0, 100) : [];
 
       if (fixtures.length > 0 && serverStore.trackedFixtures.length === 0) {
@@ -850,7 +850,7 @@ Return ONLY a valid JSON object (no markdown fences if possible) with these fiel
 
       const fixtureListText = fixtures.length > 0
         ? fixtures.map((f: any) => `- ${sanitizeText(f?.homeTeam, 80)} vs ${sanitizeText(f?.awayTeam, 80)} (${sanitizeText(f?.competition, 80)}, scheduled ${sanitizeText(f?.kickoffTimeUtc, 48)})`).join('\n')
-        : 'UEFA Nations League, AFCON 2027 Qualifiers, and EFL League One matches on 14 November 2026';
+        : 'UEFA Nations League, AFCON 2027 Qualifiers, Premier League, La Liga, Serie A, and world matches on 15 November 2026';
 
       const prompt = `Verify the real-world football schedule, match statuses (NS/LIVE/HT/FT/POSTP), and any live, half-time, or final scores for ${dateLabel} (UTC / Africa/Kampala EAT) using Google Search.
 Specifically verify these tracked fixtures:

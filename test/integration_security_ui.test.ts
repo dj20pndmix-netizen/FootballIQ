@@ -218,7 +218,7 @@ async function runTests() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         trigger: 'manual',
-        dateLabel: '14 November 2026',
+        dateLabel: '15 November 2026',
         forceExternal: false,
         fixtures: testFixtures,
       }),
