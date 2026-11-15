@@ -6,6 +6,9 @@ import {
 } from '../types/football';
 import { formatFixtureTime } from '../utils/timezone';
 import { TeamBadge } from './TeamBadge';
+import { optaIngestionService } from '../services/opta/optaIngestionService';
+import { OptaPredictionBridge, FullOptaPredictionSuite } from '../services/opta/optaPredictionBridge';
+import { OptaLineup, OptaTeamMatchStats, OptaExpectedGoalsRecord } from '../types/opta';
 import { 
   X, 
   Activity, 
@@ -19,7 +22,12 @@ import {
   Clock,
   MapPin,
   CheckCircle2,
-  MessageSquare
+  MessageSquare,
+  Crosshair,
+  Users,
+  Database,
+  Layers,
+  Zap,
 } from 'lucide-react';
 
 interface MatchDetailModalProps {
@@ -39,10 +47,20 @@ export const MatchDetailModal: React.FC<MatchDetailModalProps> = ({
   onLaunchVeo,
   onOpenChat,
 }) => {
-  const [activeTab, setActiveTab] = useState<'matrix' | 'markets' | 'scout' | 'h2h'>('matrix');
+  const [activeTab, setActiveTab] = useState<'matrix' | 'markets' | 'scout' | 'h2h' | 'opta'>('matrix');
   const [isScoutLoading, setIsScoutLoading] = useState(false);
   const [scoutReport, setScoutReport] = useState<TacticalScoutReport | null>(null);
   const [scoutError, setScoutError] = useState<string | null>(null);
+
+  // Opta Data State
+  const [isOptaLoading, setIsOptaLoading] = useState(false);
+  const [optaData, setOptaData] = useState<{
+    lineup: OptaLineup;
+    homeStats: OptaTeamMatchStats;
+    awayStats: OptaTeamMatchStats;
+    xgShots: OptaExpectedGoalsRecord[];
+    predictionSuite: FullOptaPredictionSuite;
+  } | null>(null);
 
   // Reset cached modal state whenever opening or switching to a different fixture
   useEffect(() => {
@@ -50,6 +68,8 @@ export const MatchDetailModal: React.FC<MatchDetailModalProps> = ({
     setScoutReport(null);
     setScoutError(null);
     setIsScoutLoading(false);
+    setOptaData(null);
+    setIsOptaLoading(false);
   }, [fixture?.id]);
 
   // Allow Escape key to dismiss modal accessibly
@@ -102,6 +122,34 @@ export const MatchDetailModal: React.FC<MatchDetailModalProps> = ({
       setScoutError(err.message || 'Error executing search grounding');
     } finally {
       setIsScoutLoading(false);
+    }
+  };
+
+  const handleLoadOptaData = async () => {
+    if (!fixture) return;
+    setIsOptaLoading(true);
+    try {
+      const [lineupRes, metricsRes, predRes] = await Promise.all([
+        optaIngestionService.ingestLineups(fixture.id),
+        optaIngestionService.ingestAdvancedMetrics(fixture.id),
+        optaIngestionService.ingestOptaPredictions(fixture.id),
+      ]);
+      const suite = OptaPredictionBridge.deriveOptaEnhancedPredictions(
+        fixture,
+        predRes.data,
+        { homeStats: metricsRes.data.homeStats, awayStats: metricsRes.data.awayStats }
+      );
+      setOptaData({
+        lineup: lineupRes.data,
+        homeStats: metricsRes.data.homeStats,
+        awayStats: metricsRes.data.awayStats,
+        xgShots: metricsRes.data.xgShots,
+        predictionSuite: suite,
+      });
+    } catch (err: any) {
+      console.warn('Opta data ingestion notice:', err?.message || err);
+    } finally {
+      setIsOptaLoading(false);
     }
   };
 

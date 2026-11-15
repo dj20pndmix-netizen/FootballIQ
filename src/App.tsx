@@ -8,6 +8,7 @@ import { TacticalScoutView } from './components/TacticalScoutView';
 import { CalibrationView } from './components/CalibrationView';
 import { AdminConsoleView } from './components/AdminConsoleView';
 import { MethodologyView } from './components/MethodologyView';
+import { WorldwideCoverageDashboardView } from './components/WorldwideCoverageDashboardView';
 import { GeminiChatView } from './components/GeminiChatView';
 import { PredictionOutcomeBarGraph } from './components/PredictionOutcomeBarGraph';
 import { AuthPortalView } from './components/AuthPortalView';
@@ -1013,6 +1014,8 @@ export default function App() {
                 onTriggerSync={handleTriggerSync}
               />
             )}
+
+            {activeTab === 'opta-coverage' && <WorldwideCoverageDashboardView />}
 
             {activeTab === 'methodology' && <MethodologyView />}
           </ErrorBoundary>

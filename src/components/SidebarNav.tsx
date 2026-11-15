@@ -11,6 +11,7 @@ import {
   ChevronRight,
   Flame,
   X,
+  Globe,
 } from 'lucide-react';
 import { UserProfile, isAdminUser } from '../services/firebase';
 
@@ -28,6 +29,7 @@ export const SIDEBAR_NAV_ITEMS: NavItemConfig[] = [
   { id: 'chat', label: 'AI Analyst Chat', group: 'AI Intelligence', icon: MessageSquare },
   { id: 'veo', label: 'Veo Studio', group: 'AI Intelligence', icon: Video },
   { id: 'calibration', label: 'Calibration & Graphs', group: 'Analytics', icon: BarChart3 },
+  { id: 'opta-coverage', label: 'Opta Coverage', group: 'Analytics', icon: Globe },
   { id: 'methodology', label: 'Methodology', group: 'Analytics', icon: BookOpen },
   { id: 'admin', label: 'Admin Console', group: 'Analytics', icon: Cpu, adminOnly: true },
 ];
