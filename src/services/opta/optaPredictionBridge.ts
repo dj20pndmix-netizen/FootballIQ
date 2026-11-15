@@ -254,6 +254,21 @@ export function deriveHalfGoals(homeLambda: number, awayLambda: number): MarketH
  * Generates all 12 requested markets and maintains strict provenance separation
  */
 export class OptaPredictionBridge {
+  public static deriveOptaEnhancedPredictions(
+    fixture: Fixture,
+    officialOptaPrediction?: OptaPredictionsPayload,
+    optaStats?:
+      | { homeStats: OptaTeamMatchStats; awayStats: OptaTeamMatchStats }
+      | { home: OptaTeamMatchStats; away: OptaTeamMatchStats }
+  ): FullOptaPredictionSuite {
+    const normalizedStats = optaStats
+      ? 'homeStats' in optaStats
+        ? { home: optaStats.homeStats, away: optaStats.awayStats }
+        : optaStats
+      : undefined;
+    return this.buildFullPredictionSuite(fixture, normalizedStats, officialOptaPrediction);
+  }
+
   public static buildFullPredictionSuite(
     fixture: Fixture,
     optaStats?: { home: OptaTeamMatchStats; away: OptaTeamMatchStats },

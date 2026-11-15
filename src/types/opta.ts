@@ -16,7 +16,9 @@ export type OptaCompetitionType =
   | 'DOMESTIC_CUP'
   | 'CONTINENTAL_CLUB'
   | 'INTERNATIONAL'
-  | 'REGIONAL';
+  | 'REGIONAL'
+  | 'LOWER_DIVISION'
+  | 'YOUTH_TOURNAMENT';
 
 export interface OptaCompetition {
   optaCompetitionId: string;       // e.g., 'opta:comp:8' (Premier League)
@@ -202,6 +204,8 @@ export interface OptaTeamMatchStats {
   passesTotal: number;
   passesCompleted: number;
   passAccuracyPct: number;
+  xg: number;
+  xga: number;
   xgTotal: number;
   xgaTotal: number;
   ppda: number;                    // Passes allowed per defensive action

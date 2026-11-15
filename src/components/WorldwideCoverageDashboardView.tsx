@@ -76,6 +76,7 @@ export const WorldwideCoverageDashboardView: React.FC = () => {
     'CONMEBOL',
     'CONCACAF',
     'AFC',
+    'OFC',
     'FIFA',
   ];
 
@@ -91,7 +92,7 @@ export const WorldwideCoverageDashboardView: React.FC = () => {
             <span>WORLDWIDE COVERAGE REPOSITORY</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mt-1">
-            Worldwide Competition Coverage Directory
+            Worldwide Opta Football Coverage Directory
           </h1>
           <p className="text-xs sm:text-sm text-slate-400 mt-1 max-w-2xl">
             Real-time audit of Opta-licensed tournaments globally. Tracking data completeness for Men’s, Women’s, Continental, Domestic, and Lower-Tier football leagues.

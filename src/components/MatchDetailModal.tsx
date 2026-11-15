@@ -978,16 +978,6 @@ export const MatchDetailModal: React.FC<MatchDetailModalProps> = ({
                         </div>
                       </div>
                     </div>
-                                <span className="font-semibold text-slate-200">{p.name}</span>
-                              </div>
-                              <span className="font-mono text-[10px] text-slate-400 uppercase">
-                                {p.position}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
                   </div>
 
                   {/* All 12 Prediction Markets Suite (Opta Calibrated) */}
