@@ -60,11 +60,11 @@ const DAILY_PAIRING_TEMPLATES: MatchPairingTemplate[] = [
   { competitionId: 'uel', homeTeamKey: 'asRoma', awayTeamKey: 'athleticClub', localHour: 20, localMinute: 45, venue: 'Stadio Olimpico, Rome' },
   { competitionId: 'uecl', homeTeamKey: 'chelsea', awayTeamKey: 'acMilan', localHour: 20, localMinute: 0, venue: 'Stamford Bridge, London' },
 
-  // International Competitions
-  { competitionId: 'unl', homeTeamKey: 'france', awayTeamKey: 'germany', localHour: 21, localMinute: 45, venue: 'Stade de France, Saint-Denis' },
-  { competitionId: 'unl', homeTeamKey: 'spain', awayTeamKey: 'italy', localHour: 21, localMinute: 45, venue: 'Estadio La Cartuja, Seville' },
-  { competitionId: 'unl', homeTeamKey: 'kosovo', awayTeamKey: 'israel', localHour: 21, localMinute: 45, venue: 'Fadil Vokrri Stadium, Pristina' },
-  { competitionId: 'afcon-q', homeTeamKey: 'uganda', awayTeamKey: 'southAfrica', localHour: 16, localMinute: 0, venue: 'Mandela National Stadium, Namboole, Kampala' },
+  // International Competitions (Official 15 November 2026 Slate)
+  { competitionId: 'unl', homeTeamKey: 'spain', awayTeamKey: 'england', localHour: 22, localMinute: 45, venue: 'Estadio Santiago Bernabéu, Madrid' },
+  { competitionId: 'unl', homeTeamKey: 'belgium', awayTeamKey: 'italy', localHour: 22, localMinute: 45, venue: 'King Baudouin Stadium, Brussels' },
+  { competitionId: 'unl', homeTeamKey: 'france', awayTeamKey: 'turkiye', localHour: 22, localMinute: 45, venue: 'Stade de France, Saint-Denis' },
+  { competitionId: 'unl', homeTeamKey: 'croatia', awayTeamKey: 'czechia', localHour: 22, localMinute: 45, venue: 'Stadion Maksimir, Zagreb' },
   { competitionId: 'afcon-q', homeTeamKey: 'nigeria', awayTeamKey: 'ghana', localHour: 19, localMinute: 0, venue: 'Godswill Akpabio International Stadium, Uyo' },
   { competitionId: 'afcon-q', homeTeamKey: 'morocco', awayTeamKey: 'ivoryCoast', localHour: 22, localMinute: 0, venue: 'Prince Moulay Abdellah Stadium, Rabat' },
   { competitionId: 'afcon-q', homeTeamKey: 'egypt', awayTeamKey: 'senegal', localHour: 20, localMinute: 0, venue: 'Cairo International Stadium, Cairo' },
