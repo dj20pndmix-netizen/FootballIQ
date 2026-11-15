@@ -43,6 +43,64 @@ export const FixtureCard: React.FC<FixtureCardProps> = ({
 }) => {
   const { homeTeam, awayTeam, competition, status, scores, prediction } = fixture;
 
+  // Active market settlement resolution strictly evaluated against the market being viewed
+  const activeMarketSettlement = React.useMemo(() => {
+    if (!prediction?.settlement) return null;
+    const s = prediction.settlement;
+    const sm = (s as any).settledMarkets || (s as any).markets || {};
+
+    let status: 'WON' | 'LOST' | 'VOID' = 'LOST';
+    let marketLabel = '1X2';
+    let pickLabel = prediction.market1X2.predictedOutcome;
+
+    switch (activeMarket) {
+      case 'BTTS': {
+        marketLabel = 'BTTS';
+        pickLabel = prediction.marketBTTS.predictedOutcome;
+        const actualBTTS = scores.currentHome > 0 && scores.currentAway > 0 ? 'YES' : 'NO';
+        status = sm.marketBTTS || (pickLabel === actualBTTS ? 'WON' : 'LOST');
+        break;
+      }
+      case 'OVER_UNDER_25': {
+        marketLabel = 'O/U 2.5';
+        pickLabel = prediction.marketOverUnder25.predictedOutcome;
+        const actualOU = (scores.currentHome + scores.currentAway) >= 3 ? 'OVER' : 'UNDER';
+        status = sm.marketOverUnder25 || (pickLabel === actualOU ? 'WON' : 'LOST');
+        break;
+      }
+      case 'DOUBLE_CHANCE': {
+        marketLabel = 'Double Chance';
+        pickLabel = prediction.marketDoubleChance.predictedOutcome;
+        const actual1X2 = scores.currentHome > scores.currentAway ? '1' : scores.currentHome === scores.currentAway ? 'X' : '2';
+        const actualDC = actual1X2 === '1' ? ['1X', '12'] : actual1X2 === 'X' ? ['1X', 'X2'] : ['X2', '12'];
+        status = sm.marketDoubleChance || (actualDC.includes(pickLabel) ? 'WON' : 'LOST');
+        break;
+      }
+      case 'HT_FT': {
+        marketLabel = 'HT/FT';
+        pickLabel = prediction.marketHtFt.predictedOutcome;
+        status = sm.marketHtFt || 'VOID';
+        break;
+      }
+      case '1X2_INTERVAL_10': {
+        marketLabel = '10m Interval';
+        pickLabel = prediction.market1X2Interval10?.predictedOutcome || 'X';
+        status = sm.market1X2Interval10 || (pickLabel === 'X' ? 'WON' : 'LOST');
+        break;
+      }
+      case '1X2':
+      default: {
+        marketLabel = '1X2';
+        pickLabel = prediction.market1X2.predictedOutcome;
+        const actual1X2 = scores.currentHome > scores.currentAway ? '1' : scores.currentHome === scores.currentAway ? 'X' : '2';
+        status = sm.market1X2 || (pickLabel === actual1X2 ? 'WON' : 'LOST');
+        break;
+      }
+    }
+
+    return { status, marketLabel, pickLabel };
+  }, [prediction, activeMarket, scores]);
+
   const formatProb = (p: number) => {
     if (oddsFormat === 'DECIMAL') {
       if (p <= 0.01) return '99.0';
@@ -416,21 +474,32 @@ export const FixtureCard: React.FC<FixtureCardProps> = ({
             </div>
           )}
 
-          {/* Settlement result badge if completed */}
-          {prediction.settlement && (
+          {/* Settlement result badge strictly resolved against activeMarket */}
+          {prediction.settlement && activeMarketSettlement && (
             <div className="mt-2.5 flex items-center justify-between text-xs px-2.5 py-1.5 rounded-lg bg-slate-950/60 border border-slate-800">
               <span className="text-slate-400">Verified Result:</span>
               <span className="font-mono text-slate-200">{prediction.settlement.actualScore}</span>
-              <span className={`flex items-center gap-1 font-bold text-[11px] ${
-                prediction.settlement.status === 'WON' ? 'text-emerald-400' : 'text-rose-400'
-              }`}>
-                {prediction.settlement.status === 'WON' ? (
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                ) : (
-                  <XCircle className="w-3.5 h-3.5" />
-                )}
-                {prediction.settlement.status}
-              </span>
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] text-slate-400 font-mono">
+                  {activeMarketSettlement.marketLabel} ({activeMarketSettlement.pickLabel}):
+                </span>
+                <span className={`flex items-center gap-1 font-bold text-[11px] ${
+                  activeMarketSettlement.status === 'WON'
+                    ? 'text-emerald-400'
+                    : activeMarketSettlement.status === 'LOST'
+                    ? 'text-rose-400'
+                    : 'text-amber-400'
+                }`}>
+                  {activeMarketSettlement.status === 'WON' ? (
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                  ) : activeMarketSettlement.status === 'LOST' ? (
+                    <XCircle className="w-3.5 h-3.5 text-rose-400" />
+                  ) : (
+                    <Clock className="w-3.5 h-3.5 text-amber-400" />
+                  )}
+                  {activeMarketSettlement.status}
+                </span>
+              </div>
             </div>
           )}
         </div>
