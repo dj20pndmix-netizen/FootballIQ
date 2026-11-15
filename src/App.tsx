@@ -973,22 +973,181 @@ export default function App() {
                   ))}
                 </div>
               ) : filteredFixtures.length > 0 ? (
-                <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
-                  {filteredFixtures.map((fixture) => (
-                    <FixtureCard
-                      key={fixture.id}
-                      fixture={fixture}
-                      activeMarket={activeMarket}
-                      selectedTimezone={selectedTimezone}
-                      oddsFormat={oddsFormat}
-                      onSelectFixture={(f) => setSelectedFixture(f)}
-                      onOpenScout={handleOpenScout}
-                      onOpenVeo={handleLaunchVeo}
-                      onOpenChat={handleOpenChat}
-                      onSelectMarket={setActiveMarket}
-                    />
-                  ))}
-                </div>
+                statusFilter !== 'ALL' ? (
+                  <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
+                    {filteredFixtures.map((fixture) => (
+                      <FixtureCard
+                        key={fixture.id}
+                        fixture={fixture}
+                        activeMarket={activeMarket}
+                        selectedTimezone={selectedTimezone}
+                        oddsFormat={oddsFormat}
+                        onSelectFixture={(f) => setSelectedFixture(f)}
+                        onOpenScout={handleOpenScout}
+                        onOpenVeo={handleLaunchVeo}
+                        onOpenChat={handleOpenChat}
+                        onSelectMarket={setActiveMarket}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="space-y-8">
+                    {/* 1. Live In-Play Matches */}
+                    {liveGroup.length > 0 && (
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between pb-2 border-b border-rose-900/40">
+                          <h3 className="text-sm font-bold text-rose-400 flex items-center gap-2">
+                            <span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse" />
+                            Live In-Play Matches ({liveGroup.length})
+                          </h3>
+                          <span className="text-[11px] font-mono text-rose-300/80">
+                            Real-time score & minute tracking
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
+                          {liveGroup.map(({ fixture }) => (
+                            <FixtureCard
+                              key={fixture.id}
+                              fixture={fixture}
+                              activeMarket={activeMarket}
+                              selectedTimezone={selectedTimezone}
+                              oddsFormat={oddsFormat}
+                              onSelectFixture={(f) => setSelectedFixture(f)}
+                              onOpenScout={handleOpenScout}
+                              onOpenVeo={handleLaunchVeo}
+                              onOpenChat={handleOpenChat}
+                              onSelectMarket={setActiveMarket}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* 2. Upcoming Scheduled Matches */}
+                    {upcomingGroup.length > 0 && (
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+                          <h3 className="text-sm font-bold text-slate-200 flex items-center gap-2">
+                            <Clock className="w-4 h-4 text-emerald-400" />
+                            Upcoming Scheduled Matches ({upcomingGroup.length})
+                          </h3>
+                          <span className="text-[11px] font-mono text-slate-400">
+                            Strictly scheduled for {formatLocalDateLabel(activeMatchdayDate)}
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
+                          {upcomingGroup.map(({ fixture }) => (
+                            <FixtureCard
+                              key={fixture.id}
+                              fixture={fixture}
+                              activeMarket={activeMarket}
+                              selectedTimezone={selectedTimezone}
+                              oddsFormat={oddsFormat}
+                              onSelectFixture={(f) => setSelectedFixture(f)}
+                              onOpenScout={handleOpenScout}
+                              onOpenVeo={handleLaunchVeo}
+                              onOpenChat={handleOpenChat}
+                              onSelectMarket={setActiveMarket}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* 3. Awaiting Confirmation (if any) */}
+                    {awaitingGroup.length > 0 && (
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between pb-2 border-b border-amber-900/40">
+                          <h3 className="text-sm font-bold text-amber-400 flex items-center gap-2">
+                            <AlertCircle className="w-4 h-4 text-amber-400" />
+                            Awaiting Final Result Confirmation ({awaitingGroup.length})
+                          </h3>
+                          <span className="text-[11px] font-mono text-amber-300/80">
+                            Elapsed kickoff, awaiting official provider feed confirmation
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
+                          {awaitingGroup.map(({ fixture }) => (
+                            <FixtureCard
+                              key={fixture.id}
+                              fixture={fixture}
+                              activeMarket={activeMarket}
+                              selectedTimezone={selectedTimezone}
+                              oddsFormat={oddsFormat}
+                              onSelectFixture={(f) => setSelectedFixture(f)}
+                              onOpenScout={handleOpenScout}
+                              onOpenVeo={handleLaunchVeo}
+                              onOpenChat={handleOpenChat}
+                              onSelectMarket={setActiveMarket}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* 4. Completed & Settled Results */}
+                    {completedGroup.length > 0 && (
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+                          <h3 className="text-sm font-bold text-slate-200 flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-slate-400 inline-block" />
+                            Completed & Settled Results ({completedGroup.length})
+                          </h3>
+                          <span className="text-[11px] font-mono text-emerald-400">
+                            Officially full time verified
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
+                          {completedGroup.map(({ fixture }) => (
+                            <FixtureCard
+                              key={fixture.id}
+                              fixture={fixture}
+                              activeMarket={activeMarket}
+                              selectedTimezone={selectedTimezone}
+                              oddsFormat={oddsFormat}
+                              onSelectFixture={(f) => setSelectedFixture(f)}
+                              onOpenScout={handleOpenScout}
+                              onOpenVeo={handleLaunchVeo}
+                              onOpenChat={handleOpenChat}
+                              onSelectMarket={setActiveMarket}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* 5. Postponed / Cancelled */}
+                    {postponedGroup.length > 0 && (
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+                          <h3 className="text-sm font-bold text-amber-400 flex items-center gap-2">
+                            <AlertCircle className="w-4 h-4 text-amber-400" />
+                            Postponed / Cancelled ({postponedGroup.length})
+                          </h3>
+                          <span className="text-[11px] font-mono text-amber-400/80">
+                            Integrity Void Rule Applied
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
+                          {postponedGroup.map(({ fixture }) => (
+                            <FixtureCard
+                              key={fixture.id}
+                              fixture={fixture}
+                              activeMarket={activeMarket}
+                              selectedTimezone={selectedTimezone}
+                              oddsFormat={oddsFormat}
+                              onSelectFixture={(f) => setSelectedFixture(f)}
+                              onOpenScout={handleOpenScout}
+                              onOpenVeo={handleLaunchVeo}
+                              onOpenChat={handleOpenChat}
+                              onSelectMarket={setActiveMarket}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )
               ) : (
                 <div className="py-16 text-center rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
                   <AlertCircle className="w-9 h-9 text-slate-500 mx-auto" />
