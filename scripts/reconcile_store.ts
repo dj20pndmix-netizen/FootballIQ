@@ -27,17 +27,24 @@ for (const fix of baseline) {
       syncSource: 'Verified-Historical-Reconciliation',
     };
     repairedCount++;
-  } else if (fix.status === 'FT' && existing.status !== 'FT') {
-    existing.status = 'FT';
-    existing.scores = {
-      currentHome: fix.scores.currentHome,
-      currentAway: fix.scores.currentAway,
-      ...(typeof fix.scores.htHome === 'number' ? { htHome: fix.scores.htHome } : {}),
-      ...(typeof fix.scores.htAway === 'number' ? { htAway: fix.scores.htAway } : {}),
-    };
-    existing.lastUpdatedUtc = new Date().toISOString();
-    existing.syncSource = 'Verified-Historical-Reconciliation';
-    repairedCount++;
+  } else {
+    // Reconcile metadata & status
+    existing.kickoffTimeUtc = fix.kickoffTimeUtc;
+    existing.homeTeamName = fix.homeTeam.name;
+    existing.awayTeamName = fix.awayTeam.name;
+    existing.competitionId = fix.competition.id;
+    if (fix.status === 'FT') {
+      existing.status = 'FT';
+      existing.scores = {
+        currentHome: fix.scores.currentHome,
+        currentAway: fix.scores.currentAway,
+        ...(typeof fix.scores.htHome === 'number' ? { htHome: fix.scores.htHome } : {}),
+        ...(typeof fix.scores.htAway === 'number' ? { htAway: fix.scores.htAway } : {}),
+      };
+      existing.lastUpdatedUtc = new Date().toISOString();
+      existing.syncSource = 'Verified-Historical-Reconciliation';
+      repairedCount++;
+    }
   }
 }
 

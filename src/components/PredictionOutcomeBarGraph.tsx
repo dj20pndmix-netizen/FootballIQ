@@ -67,26 +67,29 @@ export const PredictionOutcomeBarGraph: React.FC<PredictionOutcomeBarGraphProps>
     [fixtures, selectedMarket]
   );
 
-  const totalPicks = Math.max(1, stats.won + stats.lost + stats.pending);
+  const settledTotal = stats.won + stats.lost;
+  const wonPct = settledTotal > 0 ? Number(((stats.won / settledTotal) * 100).toFixed(1)) : 0;
+  const lostPct = settledTotal > 0 ? Number(((stats.lost / settledTotal) * 100).toFixed(1)) : 0;
+  const pendingVolumePct = stats.total > 0 ? Number(((stats.pending / stats.total) * 100).toFixed(1)) : 0;
   const maxSummaryCount = Math.max(1, stats.won, stats.lost, stats.pending);
 
   const columns: VerticalColumnData[] = [
     {
       key: 'WON',
-      label: 'Won (Accurate)',
+      label: 'Won (Settled Accurate)',
       shortLabel: 'Won',
       count: stats.won,
-      pct: Number(((stats.won / totalPicks) * 100).toFixed(1)),
+      pct: wonPct,
       fill: '#10b981',
       textClass: 'text-emerald-400',
       surfaceClass: 'bg-emerald-950/50 border-emerald-700/70',
     },
     {
       key: 'LOST',
-      label: 'Lost (Missed)',
+      label: 'Lost (Settled Missed)',
       shortLabel: 'Lost',
       count: stats.lost,
-      pct: Number(((stats.lost / totalPicks) * 100).toFixed(1)),
+      pct: lostPct,
       fill: '#f43f5e',
       textClass: 'text-rose-400',
       surfaceClass: 'bg-rose-950/50 border-rose-700/70',
@@ -96,7 +99,7 @@ export const PredictionOutcomeBarGraph: React.FC<PredictionOutcomeBarGraphProps>
       label: 'Pending (In-Play / Upcoming)',
       shortLabel: 'Pending',
       count: stats.pending,
-      pct: Number(((stats.pending / totalPicks) * 100).toFixed(1)),
+      pct: pendingVolumePct,
       fill: '#f59e0b',
       textClass: 'text-amber-400',
       surfaceClass: 'bg-amber-950/50 border-amber-700/70',
@@ -306,7 +309,7 @@ export const PredictionOutcomeBarGraph: React.FC<PredictionOutcomeBarGraphProps>
                       fontFamily="JetBrains Mono, monospace"
                       fill="#f8fafc"
                     >
-                      {col.count} ({col.pct}%)
+                      {col.key === 'PENDING' ? `${col.count} vol` : `${col.count} (${col.pct}%)`}
                     </text>
 
                     {/* X-Axis Label */}
@@ -481,7 +484,7 @@ export const PredictionOutcomeBarGraph: React.FC<PredictionOutcomeBarGraphProps>
                   <div className="flex items-center justify-between">
                     <Icon className={`w-3.5 h-3.5 ${col.textClass}`} />
                     <span className="text-[11px] font-mono tabular-nums text-slate-400">
-                      {col.pct}%
+                      {col.key === 'PENDING' ? 'Volume' : `${col.pct}%`}
                     </span>
                   </div>
                   <div className={`text-xl font-bold font-mono tabular-nums mt-1.5 ${col.textClass}`}>
@@ -493,6 +496,20 @@ export const PredictionOutcomeBarGraph: React.FC<PredictionOutcomeBarGraphProps>
                 </button>
               );
             })}
+          </div>
+
+          {/* Settled Accuracy & Denominator Integrity Callout */}
+          <div className="text-[11px] text-slate-400 bg-slate-900/60 border border-slate-800/80 rounded-lg px-2.5 py-1.5 flex flex-wrap items-center justify-between gap-1">
+            <span>
+              Settled Accuracy:{' '}
+              <strong className="text-emerald-400 font-mono">
+                {stats.settledAccuracyPct}%
+              </strong>{' '}
+              ({stats.won}W / {stats.lost}L of {settledTotal} settled)
+            </span>
+            <span className="text-slate-500 font-mono text-[10px]">
+              {stats.pending} in-play/upcoming excluded
+            </span>
           </div>
 
           {/* Interactive Pick List */}
