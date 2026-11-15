@@ -107,17 +107,20 @@ export function gradeFixtureSettlement(
       ],
     };
 
+    const settlementRec = {
+      status: 'VOID' as const,
+      verifiedAt: settledAt,
+      actualScore: isPostponed ? 'Postponed' : 'Cancelled',
+      settledMarkets,
+    };
+
     return {
       settledFixture: {
         ...fixture,
+        settlement: settlementRec as any,
         prediction: {
           ...pred,
-          settlement: {
-            status: 'VOID',
-            verifiedAt: settledAt,
-            actualScore: isPostponed ? 'Postponed' : 'Cancelled',
-            settledMarkets,
-          },
+          settlement: settlementRec,
         },
       },
       audit,
@@ -257,16 +260,19 @@ export function gradeFixtureSettlement(
     auditTrail,
   };
 
+  const settlementRec = {
+    status: overallSettlementStatus,
+    verifiedAt: settledAt,
+    actualScore: actualScoreLabel,
+    settledMarkets: settledMarkets as any,
+  };
+
   const settledFixture: Fixture = {
     ...fixture,
+    settlement: settlementRec as any,
     prediction: {
       ...pred,
-      settlement: {
-        status: overallSettlementStatus,
-        verifiedAt: settledAt,
-        actualScore: actualScoreLabel,
-        settledMarkets: settledMarkets as any,
-      },
+      settlement: settlementRec,
     },
   };
 
@@ -306,4 +312,41 @@ export function settleFixtureList(
   });
 
   return { settledFixtures, newlySettledCount, audits };
+}
+
+/**
+ * Convenient single-fixture settlement helper
+ */
+export function settleFixtureRecord(fixture: Fixture, source?: string): Fixture {
+  return gradeFixtureSettlement(fixture, source).settledFixture;
+}
+
+/**
+ * Convenient batch settlement helper
+ */
+export function batchSettleFixtures(
+  fixtures: Fixture[],
+  source?: string
+): {
+  fixtures: Fixture[];
+  settledCount: number;
+  alreadySettledCount: number;
+  audits: DetailedSettlementAudit[];
+} {
+  let alreadySettledCount = 0;
+  for (const f of fixtures) {
+    if (f.status === 'FT' && f.prediction?.settlement && f.scores) {
+      const currentLabel = `${f.scores.currentHome} - ${f.scores.currentAway}`;
+      if (f.prediction.settlement.actualScore?.startsWith(currentLabel)) {
+        alreadySettledCount++;
+      }
+    }
+  }
+  const result = settleFixtureList(fixtures, source);
+  return {
+    fixtures: result.settledFixtures,
+    settledCount: result.newlySettledCount,
+    alreadySettledCount,
+    audits: result.audits,
+  };
 }

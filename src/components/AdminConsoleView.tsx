@@ -256,6 +256,77 @@ export const AdminConsoleView: React.FC<AdminConsoleViewProps> = ({
             )}
           </div>
 
+          {/* Automated Settlement & Integrity Monitor */}
+          <div className="p-6 rounded-3xl bg-slate-900/90 border border-slate-800 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-bold text-slate-200 flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                Automated Settlement Engine & Integrity
+              </h3>
+              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-950 text-emerald-400 border border-emerald-800">
+                Active Audit
+              </span>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2.5 text-xs">
+              <div className="p-3 rounded-xl bg-slate-950 border border-slate-850">
+                <span className="text-slate-400 text-[10px]">Settled &amp; Graded</span>
+                <div className="text-xl font-bold font-mono text-emerald-400 mt-1">
+                  {settlementStats.settled}
+                </div>
+              </div>
+              <div className="p-3 rounded-xl bg-slate-950 border border-slate-850">
+                <span className="text-slate-400 text-[10px]">Pending (In-Play/Upcoming)</span>
+                <div className="text-xl font-bold font-mono text-amber-400 mt-1">
+                  {settlementStats.pending}
+                </div>
+              </div>
+              <div className="p-3 rounded-xl bg-slate-950 border border-slate-850">
+                <span className="text-slate-400 text-[10px]">Awaiting Settlement</span>
+                <div className={`text-xl font-bold font-mono mt-1 ${settlementStats.awaiting > 0 ? 'text-rose-400' : 'text-slate-400'}`}>
+                  {settlementStats.awaiting}
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-2 flex items-center justify-between gap-3">
+              <p className="text-[11px] text-slate-400">
+                Reconciles verified FT match results with pre-match probabilistic predictions across 1X2, BTTS, O/U 2.5, DC, and HT/FT.
+              </p>
+              <button
+                onClick={handleReconcileSettlement}
+                disabled={isReconcilingSettlement}
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-colors shrink-0 disabled:opacity-50"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${isReconcilingSettlement ? 'animate-spin' : ''}`} />
+                <span>{isReconcilingSettlement ? 'Reconciling...' : 'Reconcile Settlements'}</span>
+              </button>
+            </div>
+
+            {settlementReconciliationResult && (
+              <div className="p-3 rounded-2xl bg-slate-950 border border-slate-850 text-xs space-y-1.5">
+                <div className="flex items-center justify-between font-semibold text-slate-200">
+                  <span>Reconciliation Complete:</span>
+                  <span className="text-emerald-400 font-mono">
+                    {settlementReconciliationResult.settledCount ?? 0} settled, {settlementReconciliationResult.alreadySettledCount ?? 0} retained
+                  </span>
+                </div>
+                {settlementReconciliationResult.details && settlementReconciliationResult.details.length > 0 && (
+                  <div className="text-[10px] text-slate-400 font-mono max-h-24 overflow-y-auto space-y-0.5 pt-1">
+                    {settlementReconciliationResult.details.slice(0, 5).map((d: any, idx: number) => (
+                      <div key={idx} className="flex items-center justify-between">
+                        <span>{d.teams} ({d.score})</span>
+                        <span className={d.status === 'WON' ? 'text-emerald-400' : d.status === 'LOST' ? 'text-rose-400' : 'text-amber-400'}>
+                          {d.status}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
           {/* Model Deployment & Artifacts */}
           <div className="p-6 rounded-3xl bg-slate-900/90 border border-slate-800 space-y-4">
             <h3 className="text-sm font-bold text-slate-200 flex items-center gap-2">
